@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+ <class name="com.liming.workplan.model.pojo.Attachment" table="ATTACHMENT">
+  <id name="attachmentId" type="string">
+   <generator class="assigned"/>
+  </id>
+  <property generated="never" lazy="false" name="attachmentName" type="string"/>
+  <property generated="never" lazy="false" name="attachmentURL" type="string"/>
+  <property generated="never" lazy="false" name="typeDesc" type="string"/>
+  <set inverse="true" name="node" sort="unsorted">
+   <key column="attachmentId"/>
+   <one-to-many class="com.liming.workplan.model.pojo.WorkPlanNode"/>
+  </set>
+ </class>
+</hibernate-mapping>

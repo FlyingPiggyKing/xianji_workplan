@@ -1,0 +1,14 @@
+<Context
+	antiJARLocking="true"
+	antiResourceLocking="false"
+	reloadable="true">
+	<Resource name="jdbc/WorkPlanManagement"
+	          auth="Container"
+	          type="javax.sql.DataSource"
+	          username="root"
+	          password=""
+	          driverClassName="com.mysql.jdbc.Driver"
+	          url="jdbc:mysql://localhost/workplan_management?characterEncoding=UTF-8"
+	          maxActive="50"
+	          maxIdle="25"/>
+</Context>

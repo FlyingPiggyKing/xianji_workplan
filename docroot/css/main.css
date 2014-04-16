@@ -1,0 +1,115 @@
+.tableContainer {
+	overflow-x: auto;
+}
+/** BASE TABLE HEADER SORTING **/
+.sortArrow {
+	background: url("../images/sort-arrow-sprite.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+	bottom: 0.5ex;
+    height: 10px;
+    overflow: hidden;
+    right: 0;
+    width: 7px;
+    position: absolute;
+}
+
+.sortArrowAsc {
+	background: url("../images/sort-arrow-sprite.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+	background-position: 0 -10px;
+	bottom: 0.5ex;
+    height: 10px;
+    overflow: hidden;
+    right: 0;
+    width: 7px;
+    position: absolute;
+}
+
+.sortArrowDesc {
+	background: url("../images/sort-arrow-sprite.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);
+	background-position: 0 -20px;
+	bottom: 0.5ex;
+    height: 10px;
+    overflow: hidden;
+    right: 0;
+    width: 7px;
+    position: absolute;
+}
+
+.datatable-sort-cell-container {
+	position: relative;
+}
+
+/** BASE TABLE PAGINATOR CONTROLS **/
+.yui3-widget .controls {
+    padding-top: 15px;
+    padding-bottom: 10px;
+    position: relative;
+}
+.yui3-widget .controls ul {
+    margin: 0;
+    padding: 0;
+}
+.yui3-widget .controls li {
+    list-style: none;
+    display: inline-block;
+    zoom: 1; *display: inline;
+}
+.yui3-widget .controls ul,
+.yui3-widget .controls div {
+    display: inline-block;
+    zoom: 1; *display: inline;
+    vertical-align: middle;
+}
+.yui3-widget .controls a {
+    display: inline-block;
+    zoom: 1; *display: inline;
+    border: solid 1px #ddd;
+    text-decoration: none;
+    line-height: 1.7em;
+    padding: 0 8px;
+    color: #4A4A4A;
+    background: #fff;
+    cursor: pointer;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.yui3-widget .controls a:hover {
+    background-color: #eee;
+    color: #000;
+}
+.yui3-widget .controls a:active {
+    background: #333;
+    color: #fff;
+    border-color: #333;
+}
+.yui3-widget .controls a.disabled,
+.yui3-widget .controls a.disabled:hover {
+    color: #f2f2f2;
+    border-color: #f2f2f2;
+    background: #fff;
+    cursor: default;
+}
+.yui3-widget .currentPage {
+    padding-left: 20px;
+}
+.yui3-widget .rowsPerPage {
+    position: absolute;
+    right: 0;
+    line-height: 1.8em;
+    background: red;
+}
+.yui3-widget .controls select {
+/*
+    background: none;
+    font-size: 12px;
+    line-height: 1.7em;
+    border: 1px solid #ddd;
+    border-radius: 0;
+    padding-left: 8px;
+    margin-left: 5px;
+    -webkit-appearance: none;
+*/
+}	

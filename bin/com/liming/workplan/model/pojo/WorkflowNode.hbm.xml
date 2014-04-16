@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+                                   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+ <class name="com.liming.workplan.model.pojo.WorkflowNode" table="WORK_FLOW_NODE">
+  <id name="workflowId" type="int">
+   <generator class="hilo">
+    <param name="table">workplan_management_sequence</param>
+    <param name="column">next_value</param>
+    <param name="max_lo">100</param>
+   </generator>
+  </id>
+  <version name="hibernateVersion" access="field" column="HIBERNATE_OBJ_VERSION"/>
+  <property generated="never" lazy="false" name="workplanNodeId" type="integer"/>
+  <property generated="never" lazy="false" name="status" type="string"/>
+  <property generated="never" lazy="false" name="approver" type="string"/>
+  <property generated="never" lazy="false" name="approvedDate" type="date"/>
+  <property generated="never" lazy="false" name="approvingRoleId" type="long"/>
+  <property generated="never" lazy="false" name="comment" type="string"/>
+  <property generated="never" lazy="false" name="nodeType" type="string"/>
+ </class>
+</hibernate-mapping>
