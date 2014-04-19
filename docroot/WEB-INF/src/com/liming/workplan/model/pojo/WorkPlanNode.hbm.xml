@@ -28,7 +28,7 @@
    <property generated="never" lazy="false" name="projectLevel" type="string"/>
    <property generated="never" lazy="false" name="charger" type="string"/>
    <property generated="never" lazy="false" name="assistant" type="string"/>
-   <property generated="never" lazy="false" name="projectFunding" type="float"/>
+   <property generated="never" lazy="false" name="projectFunding" type="double"/>
    <property generated="never" lazy="false" name="delegatedDepartment" type="string"/>
   </joined-subclass>
  </class>

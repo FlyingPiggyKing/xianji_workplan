@@ -33,9 +33,9 @@ public class DataConvertTool {
 		} else if(item instanceof BigDecimal) {
 			BigDecimal numberItem = (BigDecimal)item;
 			strValue = numberItem.toString();
-		} else if(item instanceof Float) {
-			Float floatItem = (Float)item;
-			strValue = floatItem.toString();
+		} else if(item instanceof Double) {
+			Double doubleItem = (Double)item;
+			strValue = doubleItem.toString();
 		} else if(item instanceof Integer) {
 			Integer intItem = (Integer)item;
 			strValue = intItem.toString();

@@ -95,14 +95,14 @@ YUI.add("nodeGenerator", function(Y) {
     				
     			} else if(col.type == "date") {
         			
-        		} else if(col.type == "float") {
+        		} else if(col.type == "double") {
         			var input = row.item((colIndex + 1) * 2 - 1).one('input[type="text"]');
         			var value = input.get('value');
         			if("" != value) {
         				cellValue = input.get('name') 
         				+ WorkplanNodeGeneratorHelper.CONNECTOR 
         				+ input.get('value') + WorkplanNodeGeneratorHelper.CONNECTOR
-						+ "float";
+						+ "double";
         			} else {
         				cellValue = null;
         			}

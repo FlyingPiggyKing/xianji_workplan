@@ -1,6 +1,6 @@
 package com.liming.workplan.model.pojo;
 
-// Generated 2014-4-16 14:57:46 by Hibernate Tools 4.0.0
+// Generated 2014-4-19 16:07:02 by Hibernate Tools 4.0.0
 
 import java.util.Date;
 
@@ -18,7 +18,7 @@ public class ResearchProject extends
 	private String projectLevel;
 	private String charger;
 	private String assistant;
-	private float projectFunding;
+	private double projectFunding;
 	private String delegatedDepartment;
 
 	public ResearchProject() {
@@ -32,7 +32,7 @@ public class ResearchProject extends
 			Attachment attachment, WorkflowNode workflowNode, String type,
 			String projectType, String projectName, String supportUnit,
 			String projectLevel, String charger, String assistant,
-			float projectFunding, String delegatedDepartment) {
+			double projectFunding, String delegatedDepartment) {
 		super(author, createDate, status, attachment, workflowNode);
 		this.type = type;
 		this.projectType = projectType;
@@ -101,11 +101,11 @@ public class ResearchProject extends
 		this.assistant = assistant;
 	}
 
-	public float getProjectFunding() {
+	public double getProjectFunding() {
 		return this.projectFunding;
 	}
 
-	public void setProjectFunding(float projectFunding) {
+	public void setProjectFunding(double projectFunding) {
 		this.projectFunding = projectFunding;
 	}
 

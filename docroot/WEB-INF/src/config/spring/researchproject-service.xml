@@ -168,7 +168,7 @@
 				<map>
 					<entry>
 						<key><value>type</value></key>
-						<value>float</value>
+						<value>double</value>
 					</entry>
 					<entry>
 						<key><value>setter</value></key>

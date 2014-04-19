@@ -1,15 +1,16 @@
 package com.liming.workplan.utils;
 
 public interface Constants {
+	public static final String WorlplanBasePortlet_RESOURCE_CMD_ADD = "add";
+	public static final String WorlplanBasePortlet_RESOURCE_CMD_DELETE = "delete";
+	public static final String WorlplanBasePortlet_RESOURCE_CMD_PUBLISH_COUNT = "pcount";
+	public static final String WorlplanBasePortlet_RESOURCE_CMD_UNPUBLISHED_COUNT = "upcount";
+	public static final String WorlplanBasePortlet_RESOURCE_CMD_LOAD_PUBLISHED_NODES = "getPublishedNodes";
+	public static final String WorlplanBasePortlet_RESOURCE_CMD_EXPORT = "export";
+	public static final String WorlplanBasePortlet_RESOURCE_CMD_LOAD_UNPUBLISHED_NODES = "getUnPublishedNodes";
+	
 	public static final String WorkPlanManagementPortlet_RESOURCE_CMD = "resource_cmd";
-	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_ADD = "add";
-	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_DELETE = "delete";
-	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_PUBLISH_COUNT = "pcount";
-	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_UNPUBLISHED_COUNT = "upcount";
-	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_LOAD_PUBLISHED_NODES = "getPublishedNodes";
 	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_STATISTICS = "statistics";
-	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_EXPORT = "export";
-	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_LOAD_UNPUBLISHED_NODES = "getUnPublishedNodes";
 	public static final String WorkPlanManagementPortlet_PARAM_IDS_KEY = "ids";
 	
 	public static final String WorkflowManagementPortlet_RESOURCE_CMD = "resource_cmd";

@@ -175,8 +175,8 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 					valueMap.put(valueSeg[0], valueSeg[1]);
 				} else if("date".equals(valueSeg[2])) {
 
-				} else if("float".equals(valueSeg[2])) {
-					valueMap.put(valueSeg[0], Float.valueOf(valueSeg[1]));
+				} else if("double".equals(valueSeg[2])) {
+					valueMap.put(valueSeg[0], Double.valueOf(valueSeg[1]));
 				}
 			}
 		}
@@ -228,14 +228,14 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 				typeClass = String.class;
 			} else if("date".equals(type)) {
 				typeClass = Date.class;
-			} else if("float".equals(type)) {
-				typeClass = float.class;
+			} else if("double".equals(type)) {
+				typeClass = double.class;
 			}
 			try {
 				Method method = targetClass.getMethod(methodName, typeClass);
 				try {
-					if("float".equals(type)) {
-						method.invoke(researchProject, ((Float)data.get(cell.get("field"))).floatValue());
+					if("double".equals(type)) {
+						method.invoke(researchProject, ((Double)data.get(cell.get("field"))).doubleValue());
 					} else {
 						method.invoke(researchProject, data.get(cell.get("field")));
 					}

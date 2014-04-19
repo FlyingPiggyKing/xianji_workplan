@@ -18,7 +18,7 @@ import com.liming.workplan.utils.UserThreadLocal;
 public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl implements ResearchProjectService {
 
 	private final String TARGET_TYPE = "ResearchProject";
-	private final String FORMAT_FLOAT = "#.00000";
+	private final String FORMAT_DOUBLE = "#.00000";
 	private enum TableColumn {
 		NODEID("nodeId"),
 		TYPE("type"),
@@ -94,7 +94,7 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 		row.put(TableColumn.PROJECT_LEVEL.value(), node.getProjectLevel());
 		row.put(TableColumn.CHARGER.value(), node.getCharger());
 		row.put(TableColumn.ASSISTANT.value(), node.getAssistant());
-		row.put(TableColumn.PROJECT_FUNDING.value(), Float.toString(node.getProjectFunding()));
+		row.put(TableColumn.PROJECT_FUNDING.value(), Double.toString(node.getProjectFunding()));
 		row.put(TableColumn.DELEGATED_DEPARTMENT.value(), node.getDelegatedDepartment());
 	}
 	
@@ -151,7 +151,7 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 		Map<String, Object> searchObject = convertStringToObj(searchParams);
 		Map<String, Object> statistics = researchProjectDao.getStatistics(searchObject);
 		Double statDouble = (Double)statistics.get(StatisticsColumn.PROJECT_FOUNDING.value());
-		DecimalFormat format = new DecimalFormat(FORMAT_FLOAT);
+		DecimalFormat format = new DecimalFormat(FORMAT_DOUBLE);
 		Map<String, String> statDisplay = new HashMap<String, String>();
 		statDisplay.put(StatisticsColumn.PROJECT_FOUNDING.value(), format.format(statDouble));
 		return statDisplay;
