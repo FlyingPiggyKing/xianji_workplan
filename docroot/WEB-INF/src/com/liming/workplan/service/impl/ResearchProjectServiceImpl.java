@@ -239,7 +239,7 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 		List<String> exportHeader = getExportTableHeader();
 
 		Map<String, Object> searchObject = convertStringToObj(searchParams);
-		super.exportResult(exportHeader, searchObject, os, exportDao);
+		super.exportResult(TARGET_TYPE, exportHeader, searchObject, os, exportDao);
 	}
 	
 	public Object[] convertPojoToObject(Object[] pojos) {

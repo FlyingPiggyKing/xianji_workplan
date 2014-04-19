@@ -262,7 +262,7 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 	}
 	
 	
-	public void exportResult(List<String> columns, Map<String, Object> searchOb, OutputStream os, ExportDao exportDao) {
+	public void exportResult(String type, List<String> columns, Map<String, Object> searchOb, OutputStream os, ExportDao exportDao) {
 		User currentUser = UserThreadLocal.getCurrentUser();
 		Locale userLocale = currentUser.getLocale();
 		WritableWorkbook wwb = null;
@@ -284,7 +284,7 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 			//do business
 			Integer resultIndex = 0;
 			
-			ScrollableResults scrollResult = exportDao.getPublishedResearchPorjectsScroll(searchOb);
+			ScrollableResults scrollResult = exportDao.getPublishedResearchPorjectsScroll(type, searchOb);
 
 			while(resultIndex != -1 && resultIndex <= 65500) {// && resultIndex <= 5000 <-- remove the download limition, this is requested by business.
 				List<Object[]> batchResult = new ArrayList<Object[]>();

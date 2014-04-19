@@ -7,6 +7,8 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
+import org.hibernate.ScrollMode;
+import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
@@ -138,6 +140,42 @@ public abstract class WorkPlanNodeDaoBaseImpl {
 			query.setParameter(PARAM_AUTHOR, userId);
 			query.executeUpdate();
 		}
+	}
+	
+	public ScrollableResults getPublishedResearchPorjectsScroll(String type, Map<String, Object> searchObj) {
+		StringBuilder hqlBuilder = new StringBuilder();
+		hqlBuilder.append(HQL_FROM);
+		hqlBuilder.append(type);
+		hqlBuilder.append(QUERY_BY_STATUS);
+		Set<String> keys = searchObj.keySet();
+		for(String key : keys) {
+			hqlBuilder.append(" and r.");
+			hqlBuilder.append(key);
+			hqlBuilder.append(" = :" + key);
+		}
+		
+		Session session = getSessionFactory().getCurrentSession();
+		Query query = session.createQuery(hqlBuilder.toString());
+		query.setParameter(Constants.WorkplanNode_STATUS, Constants.WorkPlanNode_STATUS_PUBLISH);
+		for(String key : keys) {
+			query.setParameter(key, searchObj.get(key));
+		}
+		ScrollableResults scrollResult = query.setReadOnly(true).scroll(ScrollMode.FORWARD_ONLY);
+		return scrollResult;
+	}
+	
+	public int getBatchResultByScrolling(ScrollableResults scrollResult, Integer beginIndex, List<Object[]> batchResult) {
+		while(scrollResult.next()) {
+			
+			Object[] row = (Object[])scrollResult.get();
+			batchResult.add(row);
+			beginIndex++;
+			if(beginIndex % 100 == 0) {
+				return beginIndex;
+			}
+		}
+		beginIndex = -1;
+		return beginIndex;
 	}
 
 	public SessionFactory getSessionFactory() {
