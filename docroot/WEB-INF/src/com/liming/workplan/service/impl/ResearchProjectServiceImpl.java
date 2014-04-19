@@ -200,13 +200,13 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 	@Override
 	public Long getPublishedCount(String[] searchParams) {
 		Map<String, Object> searchObject = convertStringToObj(searchParams);
-		return researchProjectDao.getPublishedCount(searchObject);
+		return researchProjectDao.getPublishedCount(TARGET_TYPE, searchObject);
 	}
 
 	@Override
 	public Long getUnPublishedCount() {
 		User currentUser = UserThreadLocal.getCurrentUser();
-		return researchProjectDao.getUnPublishedCount(currentUser.getUserId());
+		return researchProjectDao.getUnPublishedCount(TARGET_TYPE, currentUser.getUserId());
 	}
 
 	@Override

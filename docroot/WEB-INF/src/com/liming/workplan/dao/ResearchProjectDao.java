@@ -14,7 +14,7 @@ public interface ResearchProjectDao extends ExportDao {
 	public List<Object> getUnPublishedResearchPorjects(String type, long userId, int pageNumber, int pageSize, String sortColumn, String order);
 	public void updateNodes(List<ResearchProject> nodes);
 	public void deleteResearchProjects(String[] ids, long userId);
-	public Long getPublishedCount(Map<String, Object> searchObj);
-	public Long getUnPublishedCount(long userId);
+	public Long getPublishedCount(String type, Map<String, Object> searchObj);
+	public Long getUnPublishedCount(String type, long userId);
 	public Map<String, Object> getStatistics(Map<String, Object> searchObj);
 }

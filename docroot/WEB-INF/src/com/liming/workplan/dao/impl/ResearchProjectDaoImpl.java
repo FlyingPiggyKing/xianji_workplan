@@ -71,24 +71,7 @@ public class ResearchProjectDaoImpl extends WorkPlanNodeDaoBaseImpl implements R
 	
 	
 	
-	public Long getPublishedCount(Map<String, Object> searchObj) {
-		StringBuilder hqlBuilder = new StringBuilder();
-		hqlBuilder.append(COUNT_BY_STATUS);
-		Set<String> keys = searchObj.keySet();
-		for(String key : keys) {
-			hqlBuilder.append(" and r.");
-			hqlBuilder.append(key);
-			hqlBuilder.append(" = :" + key);
-		}
-		Session session = getSessionFactory().getCurrentSession();
-		Query query = session.createQuery(hqlBuilder.toString());
-		query.setParameter(Constants.WorkplanNode_STATUS, Constants.WorkPlanNode_STATUS_PUBLISH);
-		for(String key : keys) {
-			query.setParameter(key, searchObj.get(key));
-		}
-		Long count = (Long)query.uniqueResult();
-		return count;
-	}
+
 	
 //	public List<ResearchProject> getUnPublishedResearchPorjects(long userId, int pageNumber, int pageSize, String sortColumn, String order) {
 //		Session session = sessionFactory.getCurrentSession();
@@ -132,17 +115,6 @@ public class ResearchProjectDaoImpl extends WorkPlanNodeDaoBaseImpl implements R
 		}
 	}
 
-
-
-	@Override
-	public Long getUnPublishedCount(long userId) {
-		Session session = getSessionFactory().getCurrentSession();
-		Query query = session.createQuery(COUNT_BY_STATUS_AUTHOR);
-		query.setParameter(Constants.WorkplanNode_STATUS, Constants.WorkPlanNode_STATUS_PUBLISH);
-		query.setParameter(PARAM_AUTHOR, userId);
-		Long count = (Long)query.uniqueResult();
-		return count;
-	}
 
 	@Override
 	public Map<String, Object> getStatistics(Map<String, Object> searchObj) {
