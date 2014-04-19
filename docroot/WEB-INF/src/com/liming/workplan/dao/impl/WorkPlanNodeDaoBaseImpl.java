@@ -22,6 +22,10 @@ public abstract class WorkPlanNodeDaoBaseImpl {
 	private static final String HQL_FROM = "from ";
 	private static final String HQL_COUNT = "select count(*) from ";
 	private static final String HQL_DELETE = "delete from ";
+	protected static final String HQL_AND_PREFIX = " and r.";
+	protected static final String HQL_EQUAL_HOLDER = " = :";
+	private static final String HQL_ORDER_BY = " order by r.";
+	private static final String HQL_ORDER_DESC = "desc";
 	private static final String PARAM_ID = "nodeId";
 	private static final String PARAM_AUTHOR = "author";
 	private static final String QUERY_BY_STATUS = " r where r.status = :" + Constants.WorkplanNode_STATUS;
@@ -48,9 +52,9 @@ public abstract class WorkPlanNodeDaoBaseImpl {
 		hqlBuilder.append(QUERY_BY_STATUS);
 		Set<String> keys = searchObj.keySet();
 		for(String key : keys) {
-			hqlBuilder.append(" and r.");
+			hqlBuilder.append(HQL_AND_PREFIX);
 			hqlBuilder.append(key);
-			hqlBuilder.append(" = :" + key);
+			hqlBuilder.append(HQL_EQUAL_HOLDER + key);
 		}
 		appendSortClause(sortColumn, order, hqlBuilder);
 		Session session = sessionFactory.getCurrentSession();
@@ -88,9 +92,9 @@ public abstract class WorkPlanNodeDaoBaseImpl {
 		hqlBuilder.append(COUNT_BY_STATUS);
 		Set<String> keys = searchObj.keySet();
 		for(String key : keys) {
-			hqlBuilder.append(" and r.");
+			hqlBuilder.append(HQL_AND_PREFIX);
 			hqlBuilder.append(key);
-			hqlBuilder.append(" = :" + key);
+			hqlBuilder.append(HQL_EQUAL_HOLDER + key);
 		}
 		Session session = getSessionFactory().getCurrentSession();
 		Query query = session.createQuery(hqlBuilder.toString());
@@ -120,10 +124,10 @@ public abstract class WorkPlanNodeDaoBaseImpl {
 	private void appendSortClause(String sortColumn, String order,
 			StringBuilder hqlBuilder) {
 		if(sortColumn != null) {
-			hqlBuilder.append(" order by r.");
+			hqlBuilder.append(HQL_ORDER_BY);
 			hqlBuilder.append(sortColumn);
-			if(order != null && "desc".equals(order)) {
-				hqlBuilder.append(" desc");
+			if(order != null && HQL_ORDER_DESC.equals(order)) {
+				hqlBuilder.append(Constants.BK + HQL_ORDER_DESC);
 			}
 		}
 	}
@@ -149,9 +153,9 @@ public abstract class WorkPlanNodeDaoBaseImpl {
 		hqlBuilder.append(QUERY_BY_STATUS);
 		Set<String> keys = searchObj.keySet();
 		for(String key : keys) {
-			hqlBuilder.append(" and r.");
+			hqlBuilder.append(HQL_AND_PREFIX);
 			hqlBuilder.append(key);
-			hqlBuilder.append(" = :" + key);
+			hqlBuilder.append(HQL_EQUAL_HOLDER + key);
 		}
 		
 		Session session = getSessionFactory().getCurrentSession();

@@ -18,10 +18,7 @@ import com.liming.workplan.utils.Constants;
 
 public class ResearchProjectDaoImpl extends WorkPlanNodeDaoBaseImpl implements ResearchProjectDao, ExportDao {
 	private static final Log log = LogFactory.getLog(ResearchProjectDaoImpl.class);
-	
-	
-	private static final String QUERY_BY_STATUS = "from ResearchProject r where r.status = :" + Constants.WorkplanNode_STATUS;
-	private static final String QUERY_STATISTICS = "select sum(r.projectFunding) ";
+	private static final String QUERY_STATISTICS = "select sum(r.projectFunding) from ResearchProject r where r.status = :" + Constants.WorkplanNode_STATUS;
 	
 
 	
@@ -41,12 +38,12 @@ public class ResearchProjectDaoImpl extends WorkPlanNodeDaoBaseImpl implements R
 	public Map<String, Object> getStatistics(Map<String, Object> searchObj) {
 		StringBuilder hqlBuilder = new StringBuilder();
 		hqlBuilder.append(QUERY_STATISTICS);
-		hqlBuilder.append(QUERY_BY_STATUS);
+
 		Set<String> keys = searchObj.keySet();
 		for(String key : keys) {
-			hqlBuilder.append(" and r.");
+			hqlBuilder.append(HQL_AND_PREFIX);
 			hqlBuilder.append(key);
-			hqlBuilder.append(" = :" + key);
+			hqlBuilder.append(HQL_EQUAL_HOLDER + key);
 		}
 		Session session = getSessionFactory().getCurrentSession();
 		Query query = session.createQuery(hqlBuilder.toString());
