@@ -1,15 +1,31 @@
 package com.liming.workplan.service.impl;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import jxl.Workbook;
+import jxl.WorkbookSettings;
+import jxl.write.Label;
+import jxl.write.WritableCellFormat;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
+
+import org.hibernate.ScrollableResults;
+
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.model.User;
+import com.liming.workplan.dao.ExportDao;
 import com.liming.workplan.dao.ResearchProjectDao;
 import com.liming.workplan.model.pojo.ResearchProject;
+import com.liming.workplan.service.LanguageService;
 import com.liming.workplan.service.ResearchProjectService;
 import com.liming.workplan.utils.Constants;
 import com.liming.workplan.utils.UserThreadLocal;
@@ -134,12 +150,24 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 		List<String[]> columnValues = new ArrayList<String[]>();
 		User currentUser = UserThreadLocal.getCurrentUser();
 		Locale userLocale = currentUser.getLocale();
-		
+		LanguageService service = getLanguageService();
 		for(TableColumn column : TableColumn.values()) {
-			String[] columnValue = new String[]{column.value(), getLanguageService().getMessage(column.value(), userLocale)};
+			String[] columnValue = new String[]{column.value(), service.getMessage(column.value(), userLocale)};
 			columnValues.add(columnValue);
 		}
 		columnValues.addAll(super.getTableHeader());
+		return columnValues;
+	}
+	
+	public List<String> getExportTableHeader() {
+		List<String> columnValues = new ArrayList<String>();
+//		User currentUser = UserThreadLocal.getCurrentUser();
+//		Locale userLocale = currentUser.getLocale();
+		
+		for(TableColumn column : TableColumn.values()) {
+			columnValues.add(column.value());
+		}
+		columnValues.addAll(super.getExportHeader());
 		return columnValues;
 	}
 	
@@ -183,7 +211,12 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 	@Override
 	public Map<String, String> getStatistics(String[] searchParams) {
 		Map<String, Object> searchObject = convertStringToObj(searchParams);
-		return researchProjectDao.getStatistics(searchObject);
+		Map<String, Object> statistics = researchProjectDao.getStatistics(searchObject);
+		Double statDouble = (Double)statistics.get(StatisticsColumn.PROJECT_FOUNDING.value());
+		DecimalFormat format = new DecimalFormat("#.00000");
+		Map<String, String> statDisplay = new HashMap<String, String>();
+		statDisplay.put(StatisticsColumn.PROJECT_FOUNDING.value(), format.format(statDouble));
+		return statDisplay;
 	}
 
 	@Override
@@ -199,5 +232,35 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 
 		return columnValues;
 	}
+	
+	public void exportResult(String[] searchParams, OutputStream os) {
+		ExportDao exportDao = (ExportDao)researchProjectDao;
+		List<String> exportHeader = getExportTableHeader();
+
+		Map<String, Object> searchObject = convertStringToObj(searchParams);
+		super.exportResult(exportHeader, searchObject, os, exportDao);
+	}
+	
+	public Object[] convertPojoToObject(Object[] pojos) {
+		Object[] objectValues = new Object[12];
+		int index = 0;
+		
+		ResearchProject researchProject = (ResearchProject)pojos[0];
+		objectValues[index++] = researchProject.getNodeId();
+		objectValues[index++] = researchProject.getType();
+		objectValues[index++] = researchProject.getProjectType();
+		objectValues[index++] = researchProject.getProjectName();
+		objectValues[index++] = researchProject.getSupportUnit();
+		objectValues[index++] = researchProject.getProjectLevel();
+		objectValues[index++] = researchProject.getCharger();
+		objectValues[index++] = researchProject.getAssistant();
+		objectValues[index++] = researchProject.getProjectFunding();
+		objectValues[index++] = researchProject.getDelegatedDepartment();
+
+		Object[] baseObjects = super.convertPojoToObject(pojos);
+		System.arraycopy(baseObjects, 0, objectValues, index, baseObjects.length);
+		return objectValues;
+	}
+
 
 }

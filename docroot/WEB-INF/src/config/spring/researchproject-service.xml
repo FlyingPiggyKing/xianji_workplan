@@ -285,6 +285,7 @@
                     or execution(* com.liming.workplan.service.ResearchProjectService.getPublishedCount(..)) 
                     or execution(* com.liming.workplan.service.ResearchProjectService.getUnPublishedCount(..)) 
                     or execution(* com.liming.workplan.service.ResearchProjectService.getStatistics(..)) 
+                    or execution(* com.liming.workplan.service.ResearchProjectService.exportResult(..)) 
                     or execution(* com.liming.workplan.service.WorkflowService.approveWorkflow(..)) " />
          <aop:around pointcut-ref="serviceMethod" method="doInTransaction"/>
       </aop:aspect>

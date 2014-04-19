@@ -16,13 +16,14 @@
 
 <%@ taglib uri="http://java.sun.com/portlet_2_0" prefix="portlet" %>
 <%@ taglib uri="http://liferay.com/tld/aui" prefix="aui" %>
+<%@ taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
 <portlet:defineObjects />
 
 <div id="<portlet:namespace/>container">
     <ul>
-        <li><a href="#<portlet:namespace/>view">foo</a></li>
-        <li><a href="#<portlet:namespace/>edit">bar</a></li>
+        <li><a href="#<portlet:namespace/>view"><liferay-ui:message key="display-record" /></a></li>
+        <li><a href="#<portlet:namespace/>edit"><liferay-ui:message key="my-record" /></a></li>
     </ul>
     <div>
         <div id="<portlet:namespace/>view">

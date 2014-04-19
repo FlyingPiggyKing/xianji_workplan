@@ -1,7 +1,11 @@
 package com.liming.workplan.service.impl;
 
+
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,8 +13,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import jxl.Workbook;
+import jxl.WorkbookSettings;
+import jxl.format.Colour;
+import jxl.format.UnderlineStyle;
+import jxl.write.Label;
+import jxl.write.WritableCellFormat;
+import jxl.write.WritableFont;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
+import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.ScrollableResults;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -18,6 +35,7 @@ import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.service.RoleServiceUtil;
+import com.liming.workplan.dao.ExportDao;
 import com.liming.workplan.model.pojo.Attachment;
 import com.liming.workplan.model.pojo.ResearchProject;
 import com.liming.workplan.model.pojo.WorkPlanNode;
@@ -25,6 +43,7 @@ import com.liming.workplan.model.pojo.WorkflowNode;
 import com.liming.workplan.service.LanguageService;
 import com.liming.workplan.service.WorkflowService;
 import com.liming.workplan.utils.Constants;
+import com.liming.workplan.utils.DataConvertTool;
 import com.liming.workplan.utils.UserThreadLocal;
 
 public abstract class WorkPlanNodeBaseServiceImpl {
@@ -32,6 +51,8 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 	private List<Map<String, Object>> rowConfiguration;
 	private WorkflowService workflowService;
 	private LanguageService languageService;
+	private static WritableCellFormat WFC_FONT;
+	
 	
 	private enum TableColumn {
 //		NODEID("nodeId"),
@@ -52,6 +73,22 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 		return workflowService;
 	}
 	
+	public Object[] convertPojoToObject(Object[] pojos) {
+		Object[] objectValues = new Object[2];
+		int index = 0;
+		if(pojos.length == 1) {
+			ResearchProject researchProject = (ResearchProject)pojos[0];
+			objectValues[index++] = researchProject.getAttachment().getTypeDesc();
+			objectValues[index++] = researchProject.getAttachment().getAttachmentName();
+		} else {
+			Attachment attachment = (Attachment)pojos[1];
+
+			objectValues[index++] = attachment.getTypeDesc();
+			objectValues[index++] = attachment.getAttachmentName();
+		}
+		return objectValues;
+	}
+	
 	public void fillDisplayTable(WorkPlanNode node, Map<String, String> row) {		
 //		row.put(TableColumn.NODEID.value(), Integer.toString(node.getNodeId()));
 		row.put(TableColumn.ATTACHMENT_NAME.value(), node.getAttachment().getAttachmentName());
@@ -66,6 +103,16 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 		
 		columnValues.add(new String[]{TableColumn.TYPE_DESE.value(), getLanguageService().getMessage(TableColumn.TYPE_DESE.value(), userLocale)});
 		columnValues.add(new String[]{TableColumn.ATTACHMENT_NAME.value(), getLanguageService().getMessage(TableColumn.ATTACHMENT_NAME.value(), userLocale)});
+		return columnValues;
+	}
+	
+	protected List<String> getExportHeader() {
+		List<String> columnValues = new ArrayList<String>();
+//		User currentUser = UserThreadLocal.getCurrentUser();
+//		Locale userLocale = currentUser.getLocale();
+		
+		columnValues.add(TableColumn.TYPE_DESE.value());
+		columnValues.add(TableColumn.ATTACHMENT_NAME.value());
 		return columnValues;
 	}
 
@@ -129,7 +176,6 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 	
 	protected void fillValues(Object researchProject, String setterName, Map<String, Object> data) {
 		Class targetClass = researchProject.getClass();
-		int cellIndex = 0;
 		for(Map cell: rowConfiguration) {
 			String methodName = (String)cell.get(setterName);
 			if(methodName == null) {
@@ -170,7 +216,6 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			cellIndex++;
 		}
 	}
 	
@@ -214,5 +259,100 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 
 	public void setLanguageService(LanguageService languageService) {
 		this.languageService = languageService;
+	}
+	
+	
+	public void exportResult(List<String> columns, Map<String, Object> searchOb, OutputStream os, ExportDao exportDao) {
+		User currentUser = UserThreadLocal.getCurrentUser();
+		Locale userLocale = currentUser.getLocale();
+		WritableWorkbook wwb = null;
+		try {
+			
+			WorkbookSettings workBookSetting = new WorkbookSettings();
+			//this setting is used to avoid a huge data download to exhaust the memory, 
+			//although it will sacrifice some performance
+			workBookSetting.setUseTemporaryFileDuringWrite(true);
+			wwb = Workbook.createWorkbook(os, workBookSetting);
+			WritableSheet ws = wwb.createSheet("Result", 0);
+			ws.getSettings().setDefaultColumnWidth(15);
+			int excelRowIndex = 0;
+			
+			List<List<String>> excelColumnHeaders = new ArrayList<List<String>>();
+			excelColumnHeaders.add(languageService.getMessageForRow(columns, userLocale));
+			excelRowIndex = sendDataToBrowser(excelColumnHeaders, ws, excelRowIndex);
+			
+			//do business
+			Integer resultIndex = 0;
+			
+			ScrollableResults scrollResult = exportDao.getPublishedResearchPorjectsScroll(searchOb);
+
+			while(resultIndex != -1 && resultIndex <= 65500) {// && resultIndex <= 5000 <-- remove the download limition, this is requested by business.
+				List<Object[]> batchResult = new ArrayList<Object[]>();
+
+				resultIndex = exportDao.getBatchResultByScrolling(scrollResult, resultIndex, batchResult);
+				log.debug("download report number: " + resultIndex);
+				List<List<String>> batchOutput = new ArrayList<List<String>>();
+				for(Object[] row : batchResult) {
+					batchOutput.add(DataConvertTool.convertObjectsToString(convertPojoToObject(row)));
+				}
+//				refineResult(outputs, batchOutput);
+				batchOutput = languageService.getMessageForRows(batchOutput, userLocale);
+				excelRowIndex = sendDataToBrowser(batchOutput, ws, excelRowIndex);
+			}
+			wwb.write();
+
+		} catch (Exception e){
+
+			
+		} finally {
+
+			try {
+				wwb.close();
+				os.close();
+			} catch (WriteException e) {
+
+				e.printStackTrace();
+			} catch (IOException e) {
+
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private int sendDataToBrowser(List<List<String>> data, WritableSheet ws, int excelRowIndex) {
+//		int endRowIndex = data.size() + beginIndex;
+		try {
+			
+			for(int rowIndex = 0; rowIndex < data.size(); rowIndex++) {
+				List<String> headers = data.get(rowIndex);
+				WritableCellFormat wcfFC = getWFC_Font();
+				for(int colIndex=0; colIndex < headers.size(); colIndex++){
+				   Label label = new Label(colIndex, excelRowIndex, headers.get(colIndex), wcfFC);
+					ws.addCell(label);
+				}
+				excelRowIndex++;
+			}
+			
+		} catch (RowsExceededException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (WriteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return excelRowIndex;
+	}
+	
+	private static WritableCellFormat getWFC_Font(){
+		if(WFC_FONT == null){
+			WritableFont wf = new WritableFont(WritableFont.TIMES,10,WritableFont.BOLD,false,UnderlineStyle.NO_UNDERLINE,Colour.BLACK);
+			WFC_FONT = new WritableCellFormat(wf);
+			try{
+				WFC_FONT.setBackground(Colour.GREY_25_PERCENT);
+			}catch(WriteException we){
+				we.printStackTrace();
+			}
+		}
+		return WFC_FONT;
 	}
 }

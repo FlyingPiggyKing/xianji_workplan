@@ -1,5 +1,6 @@
 package com.liming.workplan.service;
 
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,4 +22,5 @@ public interface ResearchProjectService {
 	public Long getUnPublishedCount();
 	public Map<String, String> getStatistics(String[] searchParams);
 	public List<String[]> getStatisticsHeader();
+	public void exportResult(String[] searchParams, OutputStream os);
 }

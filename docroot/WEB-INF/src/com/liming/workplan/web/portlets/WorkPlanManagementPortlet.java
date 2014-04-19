@@ -1,6 +1,7 @@
 package com.liming.workplan.web.portlets;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,7 @@ import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -101,6 +103,14 @@ public class WorkPlanManagementPortlet extends MVCPortlet {
 			JSONArray headerJson = JsonTool.convertTableHederToJson(statHeader);
 			statisticJson.put("header", headerJson);
 			resourceResponse.getWriter().write(statisticJson.toString());
+		} else if(Constants.WorkPlanManagementPortlet_RESOURCE_CMD_EXPORT.equals(cmd)) {
+			String[] searchParams = resourceRequest.getParameterValues("searchParams");
+			HttpServletResponse response = PortalUtil.getHttpServletResponse(resourceResponse);
+			response.setContentType("application/vnd.ms-excel;charset=utf-8"); 
+			response.addHeader("Content-Disposition", "attachment;filename=export.xls");
+			
+			OutputStream os = response.getOutputStream();
+			researchProjectService.exportResult(searchParams, os);
 		}
 	}
 	

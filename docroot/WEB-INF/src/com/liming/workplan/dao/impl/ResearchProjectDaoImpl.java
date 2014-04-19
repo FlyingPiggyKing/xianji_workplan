@@ -9,14 +9,17 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Query;
+import org.hibernate.ScrollMode;
+import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
+import com.liming.workplan.dao.ExportDao;
 import com.liming.workplan.dao.ResearchProjectDao;
 import com.liming.workplan.model.pojo.ResearchProject;
 import com.liming.workplan.utils.Constants;
 
-public class ResearchProjectDaoImpl implements ResearchProjectDao {
+public class ResearchProjectDaoImpl implements ResearchProjectDao, ExportDao {
 	private static final Log log = LogFactory.getLog(ResearchProjectDaoImpl.class);
 	private static final String PARAM_AUTHOR = "author";
 	private static final String PARAM_ID = "nodeId";
@@ -64,6 +67,49 @@ public class ResearchProjectDaoImpl implements ResearchProjectDao {
 		query.setMaxResults(pageSize);
 		List<ResearchProject> result = (List<ResearchProject>)query.list();
 		return result;
+	}
+	
+	public ScrollableResults getPublishedResearchPorjectsScroll(Map<String, Object> searchObj) {
+		StringBuilder hqlBuilder = new StringBuilder();
+//		hqlBuilder.append("select ");
+//		int headerIndex = 0;
+//		for(String header : headers) {
+//			hqlBuilder.append("r." + header);
+//			if(headerIndex != headers.size() - 1) {
+//				hqlBuilder.append(", ");
+//			}
+//			headerIndex++;
+//		}
+//		hqlBuilder.append(Constants.BK);
+		hqlBuilder.append(QUERY_BY_STATUS);
+		Set<String> keys = searchObj.keySet();
+		for(String key : keys) {
+			hqlBuilder.append(" and r.");
+			hqlBuilder.append(key);
+			hqlBuilder.append(" = :" + key);
+		}
+		Session session = sessionFactory.getCurrentSession();
+		Query query = session.createQuery(hqlBuilder.toString());
+		query.setParameter(Constants.WorkplanNode_STATUS, Constants.WorkPlanNode_STATUS_PUBLISH);
+		for(String key : keys) {
+			query.setParameter(key, searchObj.get(key));
+		}
+		ScrollableResults scrollResult = query.setReadOnly(true).scroll(ScrollMode.FORWARD_ONLY);
+		return scrollResult;
+	}
+	
+	public int getBatchResultByScrolling(ScrollableResults scrollResult, Integer beginIndex, List<Object[]> batchResult) {
+		while(scrollResult.next()) {
+			
+			Object[] row = (Object[])scrollResult.get();
+			batchResult.add(row);
+			beginIndex++;
+			if(beginIndex % 100 == 0) {
+				return beginIndex;
+			}
+		}
+		beginIndex = -1;
+		return beginIndex;
 	}
 	
 	public Long getPublishedCount(Map<String, Object> searchObj) {
@@ -146,7 +192,7 @@ public class ResearchProjectDaoImpl implements ResearchProjectDao {
 	}
 
 	@Override
-	public Map<String, String> getStatistics(Map<String, Object> searchObj) {
+	public Map<String, Object> getStatistics(Map<String, Object> searchObj) {
 		StringBuilder hqlBuilder = new StringBuilder();
 		hqlBuilder.append(QUERY_STATISTICS);
 		hqlBuilder.append(QUERY_BY_STATUS);
@@ -162,9 +208,9 @@ public class ResearchProjectDaoImpl implements ResearchProjectDao {
 		for(String key : keys) {
 			query.setParameter(key, searchObj.get(key));
 		}
-		Double statistics = (Double)query.uniqueResult();
-		Map<String, String> statisticsResult = new HashMap<String, String>(1);
-		statisticsResult.put("projectFunding", Double.toString(statistics));
+		Object statistics = (Double)query.uniqueResult();
+		Map<String, Object> statisticsResult = new HashMap<String, Object>(1);
+		statisticsResult.put("projectFunding", statistics);
 		return statisticsResult;
 	}
 }

@@ -8,6 +8,7 @@ public interface Constants {
 	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_UNPUBLISHED_COUNT = "upcount";
 	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_LOAD_PUBLISHED_NODES = "getPublishedNodes";
 	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_STATISTICS = "statistics";
+	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_EXPORT = "export";
 	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_LOAD_UNPUBLISHED_NODES = "getUnPublishedNodes";
 	public static final String WorkPlanManagementPortlet_PARAM_IDS_KEY = "ids";
 	
@@ -35,4 +36,6 @@ public interface Constants {
 	
 	public static final String WorkflowNode_NODE_STATUS_ACTIVE = "active";
 	public static final String WorkflowNode_NODE_STATUS_COMPLETED = "completed";
+	
+	public static final String BK = " ";
 }

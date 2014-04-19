@@ -64,7 +64,7 @@ YUI.add("recordAdding", function(Y) {
         		values.push(rowValue);
         	}
         	this._submitValues(values);
-        	rowCon.empty();
+//        	rowCon.empty();
         	this.rowCount = 0;
         },
         

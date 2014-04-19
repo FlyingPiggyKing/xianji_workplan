@@ -9,11 +9,13 @@ YUI.add("workplanTableWidget", function(Y) {
 	WorkplanNodeTable.ROW_CONTAINER = '<div id=\'rowContainer\' class=\'yui3-g\'></div>';
 	WorkplanNodeTable.BUTTON_SEARCH = '<button id="search">查询</button>';
 	WorkplanNodeTable.BUTTON_STATIS = '<button id="statistics">统计</button>';
+	WorkplanNodeTable.BUTTON_DOWNLAOD = '<button id="download">下载</button>';
 	WorkplanNodeTable.STATISTICS_CONTAINER = '<div class="statistics" />';
 	
 	Y.WorkplanNodeTable = Y.extend(WorkplanNodeTable, Y.BaseTableWidget, {
 	    initializer: function(cfg) {
 	    	this.generator = new Y.WorkplanNodeGeneratorHelper({'rowConfJson' : cfg.rowConfJson, 'hasDefault': false});
+	    	this.needStatistics = cfg.needStatistics;
 	    },
 	    
 	    _renderPreUIAdditional : function() {
@@ -32,11 +34,13 @@ YUI.add("workplanTableWidget", function(Y) {
 	    	var contentBox =  this.get('contentBox');
 	    	this.statisticsButton = this._appendButton(WorkplanNodeTable.BUTTON_STATIS);
 	    	contentBox.append(Y.Node.create(WorkplanNodeTable.STATISTICS_CONTAINER));
+	    	this.downloadButton = this._appendButton(WorkplanNodeTable.BUTTON_DOWNLAOD);
 	    },
 	    
 	    _bindUIAdditional : function() {
 	    	this.searchButton.on('click', Y.bind(this._onSearchButtonClick, this));
 	    	this.statisticsButton.on('click', Y.bind(this._onStatisticsClick, this));
+	    	this.downloadButton.on('click', Y.bind(this._onDownloadClick, this));
 	    },
 	    
 	    _appendButton: function(buttonHtml) {
@@ -128,6 +132,18 @@ YUI.add("workplanTableWidget", function(Y) {
 					}
 			};
 			Y.io(this.get('resourceURL'), submitCfg);
+		},
+		
+		_onDownloadClick : function() {
+//			this._submitButtonAjaxCommand('export');
+			var searchParam = '';
+			if(this.rowValue != null) {
+				Y.each(this.rowValue, function(row){
+					searchParam += '&searchParam=';
+					searchParam += row;
+				});
+			}
+			window.location.href = this.get('resourceURL') + searchParam + "&resource_cmd=export";
 		}
 	});
 	
