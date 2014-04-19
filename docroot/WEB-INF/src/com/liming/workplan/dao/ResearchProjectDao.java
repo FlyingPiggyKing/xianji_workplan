@@ -9,9 +9,9 @@ import com.liming.workplan.model.pojo.ResearchProject;
 
 public interface ResearchProjectDao extends ExportDao {
 	public ResearchProject create();
-	public void persist(ResearchProject transientInstance);
-	public List<ResearchProject> getPublishedResearchPorjects(Map<String, Object> searchObj, int pageNumber, int pageSize, String sortColumn, String order);
-	public List<ResearchProject> getUnPublishedResearchPorjects(long userId, int pageNumber, int pageSize, String sortColumn, String order);
+	public void persist(Object transientInstance);
+	public List<Object> getPublishedResearchPorjects(String type, Map<String, Object> searchObj, int pageNumber, int pageSize, String sortColumn, String order);
+	public List<Object> getUnPublishedResearchPorjects(String type, long userId, int pageNumber, int pageSize, String sortColumn, String order);
 	public void updateNodes(List<ResearchProject> nodes);
 	public void deleteResearchProjects(String[] ids, long userId);
 	public Long getPublishedCount(Map<String, Object> searchObj);

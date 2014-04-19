@@ -19,6 +19,10 @@ public class WorkPlanNodeDaoBaseImpl {
 	private SessionFactory sessionFactory;
 	
 	private static final String HQL_FROM = "from ";
+	private static final String PARAM_AUTHOR = "author";
+	private static final String QUERY_BY_STATUS = " r where r.status = :" + Constants.WorkplanNode_STATUS;
+	private static final String QUERY_BY_STATUS_AUTHOR = " r where r.status != :" + Constants.WorkplanNode_STATUS + " and r.author = :" + PARAM_AUTHOR;
+	
 	public void persist(Object transientInstance) {
 		log.debug("persisting ResearchProject instance");
 		try {
@@ -34,6 +38,7 @@ public class WorkPlanNodeDaoBaseImpl {
 		StringBuilder hqlBuilder = new StringBuilder();
 		hqlBuilder.append(HQL_FROM);
 		hqlBuilder.append(type);
+		hqlBuilder.append(QUERY_BY_STATUS);
 		Set<String> keys = searchObj.keySet();
 		for(String key : keys) {
 			hqlBuilder.append(" and r.");
@@ -49,8 +54,42 @@ public class WorkPlanNodeDaoBaseImpl {
 		}
 		query.setFirstResult(pageSize * (pageNumber - 1));
 		query.setMaxResults(pageSize);
-		List<ResearchProject> result = (List<ResearchProject>)query.list();
+		List<Object> result = (List<Object>)query.list();
 		return result;
+	}
+	
+	public List<Object> getUnPublishedResearchPorjects(String type, long userId, int pageNumber, int pageSize, String sortColumn, String order) {
+		Session session = sessionFactory.getCurrentSession();
+		StringBuilder hqlBuilder = new StringBuilder();
+		hqlBuilder.append(HQL_FROM);
+		hqlBuilder.append(type);
+		hqlBuilder.append(QUERY_BY_STATUS_AUTHOR);
+		appendSortClause(sortColumn, order, hqlBuilder);
+		Query query = session.createQuery(hqlBuilder.toString());
+		query.setParameter(Constants.WorkplanNode_STATUS, Constants.WorkPlanNode_STATUS_PUBLISH);
+		query.setParameter(PARAM_AUTHOR, userId);
+		query.setFirstResult(pageSize * (pageNumber - 1));
+		query.setMaxResults(pageSize);
+		List<Object> result = (List<Object>)query.list();
+		return result;
+	}
+	private void appendSortClause(String sortColumn, String order,
+			StringBuilder hqlBuilder) {
+		if(sortColumn != null) {
+			hqlBuilder.append(" order by r.");
+			hqlBuilder.append(sortColumn);
+			if(order != null && "desc".equals(order)) {
+				hqlBuilder.append(" desc");
+			}
+		}
+	}
+
+	public SessionFactory getSessionFactory() {
+		return sessionFactory;
+	}
+
+	public void setSessionFactory(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 	}
 	
 }
