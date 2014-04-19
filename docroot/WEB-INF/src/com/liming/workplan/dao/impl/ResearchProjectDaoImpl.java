@@ -21,14 +21,14 @@ import com.liming.workplan.utils.Constants;
 public class ResearchProjectDaoImpl extends WorkPlanNodeDaoBaseImpl implements ResearchProjectDao, ExportDao {
 	private static final Log log = LogFactory.getLog(ResearchProjectDaoImpl.class);
 	
-	private static final String PARAM_ID = "nodeId";
+	
 	private static final String QUERY_BY_STATUS = "from ResearchProject r where r.status = :" + Constants.WorkplanNode_STATUS;
 	private static final String PARAM_AUTHOR = "author";
 	private static final String QUERY_STATISTICS = "select sum(r.projectFunding) ";
 	
-	private static final String COUNT_BY_STATUS = "select count(*) from ResearchProject r where r.status = :" + Constants.WorkplanNode_STATUS;
-	private static final String COUNT_BY_STATUS_AUTHOR = "select count(*) from ResearchProject r where r.status != :" + Constants.WorkplanNode_STATUS + " and r.author = :" + PARAM_AUTHOR;
-	private static final String DELETE_BY_ID_AUTHOR = "delete from ResearchProject where nodeId = :" + PARAM_ID + " and author = :" + PARAM_AUTHOR;
+//	private static final String COUNT_BY_STATUS = "select count(*) from ResearchProject r where r.status = :" + Constants.WorkplanNode_STATUS;
+//	private static final String COUNT_BY_STATUS_AUTHOR = "select count(*) from ResearchProject r where r.status != :" + Constants.WorkplanNode_STATUS + " and r.author = :" + PARAM_AUTHOR;
+	
 	
 //	private SessionFactory sessionFactory;
 	
@@ -98,15 +98,7 @@ public class ResearchProjectDaoImpl extends WorkPlanNodeDaoBaseImpl implements R
 //		}
 //	}
 	
-	public void deleteResearchProjects(String[] ids, long userId) {
-		Session session = getSessionFactory().getCurrentSession();
-		for(String id : ids) {
-			Query query = session.createQuery(DELETE_BY_ID_AUTHOR);
-			query.setParameter(PARAM_ID, Integer.valueOf(id));
-			query.setParameter(PARAM_AUTHOR, userId);
-			query.executeUpdate();
-		}
-	}
+
 	
 	public void updateNodes(List<ResearchProject> nodes) {
 		Session session = getSessionFactory().getCurrentSession();

@@ -110,7 +110,7 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 	
 	public List<Map<String, String>> loadPublishedResearchProject(String[] params, int pageNumber, int pageSize, String sortColumn, String order) {
 		Map<String, Object> searchObject = convertStringToObj(params);
-		List<Object> researchProjects = researchProjectDao.getPublishedResearchPorjects(TARGET_TYPE, searchObject, pageNumber, pageSize, sortColumn, order);
+		List<Object> researchProjects = researchProjectDao.getPublishedNodes(TARGET_TYPE, searchObject, pageNumber, pageSize, sortColumn, order);
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>(researchProjects.size());
 		for(Object node : researchProjects) {
 			Map<String, String> row = new HashMap<String, String>();
@@ -136,7 +136,7 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 	
 	public List<Map<String, String>> loadUnPublishedResearchProject(int pageNumber, int pageSize, String sortColumn, String order) {
 		User currentUser = UserThreadLocal.getCurrentUser();
-		List<Object> researchProjects = researchProjectDao.getUnPublishedResearchPorjects(TARGET_TYPE, currentUser.getUserId(), pageNumber, pageSize, sortColumn, order);
+		List<Object> researchProjects = researchProjectDao.getUnPublishedNodes(TARGET_TYPE, currentUser.getUserId(), pageNumber, pageSize, sortColumn, order);
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>(researchProjects.size());
 		for(Object node : researchProjects) {
 			Map<String, String> row = new HashMap<String, String>();
@@ -194,7 +194,7 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 	@Override
 	public void deleteResearchProjects(String[] ids) {
 		User currentUser = UserThreadLocal.getCurrentUser();
-		researchProjectDao.deleteResearchProjects(ids, currentUser.getUserId());
+		researchProjectDao.deleteNodes(TARGET_TYPE, ids, currentUser.getUserId());
 	}
 
 	@Override

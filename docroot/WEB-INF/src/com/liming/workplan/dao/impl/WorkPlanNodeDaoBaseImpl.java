@@ -10,7 +10,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
-import com.liming.workplan.model.pojo.ResearchProject;
 import com.liming.workplan.utils.Constants;
 
 public abstract class WorkPlanNodeDaoBaseImpl {
@@ -20,14 +19,17 @@ public abstract class WorkPlanNodeDaoBaseImpl {
 	
 	private static final String HQL_FROM = "from ";
 	private static final String HQL_COUNT = "select count(*) from ";
+	private static final String HQL_DELETE = "delete from ";
+	private static final String PARAM_ID = "nodeId";
 	private static final String PARAM_AUTHOR = "author";
 	private static final String QUERY_BY_STATUS = " r where r.status = :" + Constants.WorkplanNode_STATUS;
 	private static final String QUERY_BY_STATUS_AUTHOR = " r where r.status != :" + Constants.WorkplanNode_STATUS + " and r.author = :" + PARAM_AUTHOR;
 	private static final String COUNT_BY_STATUS = " r where r.status = :" + Constants.WorkplanNode_STATUS;
 	private static final String COUNT_BY_STATUS_AUTHOR = " r where r.status != :" + Constants.WorkplanNode_STATUS + " and r.author = :" + PARAM_AUTHOR;
+	private static final String DELETE_BY_ID_AUTHOR = "  where nodeId = :" + PARAM_ID + " and author = :" + PARAM_AUTHOR;
 	
 	public void persist(Object transientInstance) {
-		log.debug("persisting ResearchProject instance");
+		log.debug("persisting Node instance");
 		try {
 			sessionFactory.getCurrentSession().save(transientInstance);
 			log.debug("persist successful");
@@ -37,7 +39,7 @@ public abstract class WorkPlanNodeDaoBaseImpl {
 		}
 	}
 	
-	public List<Object> getPublishedResearchPorjects(String type, Map<String, Object> searchObj, int pageNumber, int pageSize, String sortColumn, String order) {
+	public List<Object> getPublishedNodes(String type, Map<String, Object> searchObj, int pageNumber, int pageSize, String sortColumn, String order) {
 		StringBuilder hqlBuilder = new StringBuilder();
 		hqlBuilder.append(HQL_FROM);
 		hqlBuilder.append(type);
@@ -61,7 +63,7 @@ public abstract class WorkPlanNodeDaoBaseImpl {
 		return result;
 	}
 	
-	public List<Object> getUnPublishedResearchPorjects(String type, long userId, int pageNumber, int pageSize, String sortColumn, String order) {
+	public List<Object> getUnPublishedNodes(String type, long userId, int pageNumber, int pageSize, String sortColumn, String order) {
 		Session session = sessionFactory.getCurrentSession();
 		StringBuilder hqlBuilder = new StringBuilder();
 		hqlBuilder.append(HQL_FROM);
@@ -121,6 +123,20 @@ public abstract class WorkPlanNodeDaoBaseImpl {
 			if(order != null && "desc".equals(order)) {
 				hqlBuilder.append(" desc");
 			}
+		}
+	}
+	
+	public void deleteNodes(String type, String[] ids, long userId) {
+		Session session = getSessionFactory().getCurrentSession();
+		for(String id : ids) {
+			StringBuilder hqlBuilder = new StringBuilder();
+			hqlBuilder.append(HQL_DELETE);
+			hqlBuilder.append(type);
+			hqlBuilder.append(DELETE_BY_ID_AUTHOR);
+			Query query = session.createQuery(hqlBuilder.toString());
+			query.setParameter(PARAM_ID, Integer.valueOf(id));
+			query.setParameter(PARAM_AUTHOR, userId);
+			query.executeUpdate();
 		}
 	}
 
