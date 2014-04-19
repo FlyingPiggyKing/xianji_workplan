@@ -1,31 +1,16 @@
 package com.liming.workplan.service.impl;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import jxl.Workbook;
-import jxl.WorkbookSettings;
-import jxl.write.Label;
-import jxl.write.WritableCellFormat;
-import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
-import jxl.write.WriteException;
-import jxl.write.biff.RowsExceededException;
-
-import org.hibernate.ScrollableResults;
-
-import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.model.User;
 import com.liming.workplan.dao.ExportDao;
 import com.liming.workplan.dao.ResearchProjectDao;
 import com.liming.workplan.model.pojo.ResearchProject;
-import com.liming.workplan.service.LanguageService;
 import com.liming.workplan.service.ResearchProjectService;
 import com.liming.workplan.utils.Constants;
 import com.liming.workplan.utils.UserThreadLocal;
@@ -33,6 +18,7 @@ import com.liming.workplan.utils.UserThreadLocal;
 public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl implements ResearchProjectService {
 
 	private final String TARGET_TYPE = "ResearchProject";
+	private final String FORMAT_FLOAT = "#.00000";
 	private enum TableColumn {
 		NODEID("nodeId"),
 		TYPE("type"),
@@ -44,23 +30,9 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 		ASSISTANT("assistant"),
 		PROJECT_FUNDING("projectFunding"),
 		DELEGATED_DEPARTMENT("delegatedDepartment");
-//		ATTACHMENT_NAME(), !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//		ATTACHMENT_URL();
 		
 		private final String value;
         private TableColumn(String value) {
-            this.value = value;
-        }
-        public String value() {
-        	return value;
-        }
-	}
-	
-	private enum UnPublishColumn {
-		STATUS("status");
-		
-		private final String value;
-        private UnPublishColumn(String value) {
             this.value = value;
         }
         public String value() {
@@ -80,20 +52,12 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
         }
 	}
 	
-	private ResearchProjectDao researchProjectDao;
-	
-	public ResearchProjectDao getResearchProjectDao() {
-		return researchProjectDao;
-	}
-
-	public void setResearchProjectDao(ResearchProjectDao researchProjectDao) {
-		this.researchProjectDao = researchProjectDao;
-	}
+	private ResearchProjectDao researchProjectDao;	
 
 	@Override
 	public void addResearchProject(String[] itemArray) {
 		for(String item : itemArray) {
-			String[] values = item.split(Constants.ResearchProjectServiceImpl_SEP);//
+			String[] values = item.split(Constants.VALUE_SEP);//
 			Map<String, Object> valueObject = convertStringToObj(values);
 			ResearchProject researchProject = researchProjectDao.create();
 			initWorkPlanNode(researchProject, valueObject);
@@ -105,7 +69,7 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 	
 	
 	protected String getNodeType() {
-		return "ResearchProject";
+		return TARGET_TYPE;
 	}
 	
 	public List<Map<String, String>> loadPublishedResearchProject(String[] params, int pageNumber, int pageSize, String sortColumn, String order) {
@@ -147,43 +111,16 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 		return result;
 	}
 	
-	public List<String[]> getPublishedTableHeader() {
-		List<String[]> columnValues = new ArrayList<String[]>();
-		User currentUser = UserThreadLocal.getCurrentUser();
-		Locale userLocale = currentUser.getLocale();
-		LanguageService service = getLanguageService();
-		for(TableColumn column : TableColumn.values()) {
-			String[] columnValue = new String[]{column.value(), service.getMessage(column.value(), userLocale)};
-			columnValues.add(columnValue);
-		}
-		columnValues.addAll(super.getTableHeader());
-		return columnValues;
-	}
-	
-	public List<String> getExportTableHeader() {
+	protected List<String> getTableHeader() {
 		List<String> columnValues = new ArrayList<String>();
-//		User currentUser = UserThreadLocal.getCurrentUser();
-//		Locale userLocale = currentUser.getLocale();
 		
 		for(TableColumn column : TableColumn.values()) {
 			columnValues.add(column.value());
 		}
-		columnValues.addAll(super.getExportHeader());
 		return columnValues;
 	}
 	
-	public List<String[]> getUnPublishedTableHeader() {
-//		Map<String, String> columnValues = new HashMap(TableColumn.values().length + UnPublishColumn.values().length);
-		List<String[]> columnValues = new ArrayList<String[]>();
-		User currentUser = UserThreadLocal.getCurrentUser();
-		Locale userLocale = currentUser.getLocale();
-		columnValues.add(new String[]{UnPublishColumn.STATUS.value(), getLanguageService().getMessage(UnPublishColumn.STATUS.value(), userLocale)});
-		for(TableColumn column : TableColumn.values()) {
-			columnValues.add(new String[]{column.value(), getLanguageService().getMessage(column.value(), userLocale)});
-		}
-		columnValues.addAll(super.getTableHeader());
-		return columnValues;
-	}
+
 
 	@Override
 	public void updateNodes(List<ResearchProject> nodes) {
@@ -214,7 +151,7 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 		Map<String, Object> searchObject = convertStringToObj(searchParams);
 		Map<String, Object> statistics = researchProjectDao.getStatistics(searchObject);
 		Double statDouble = (Double)statistics.get(StatisticsColumn.PROJECT_FOUNDING.value());
-		DecimalFormat format = new DecimalFormat("#.00000");
+		DecimalFormat format = new DecimalFormat(FORMAT_FLOAT);
 		Map<String, String> statDisplay = new HashMap<String, String>();
 		statDisplay.put(StatisticsColumn.PROJECT_FOUNDING.value(), format.format(statDouble));
 		return statDisplay;
@@ -222,26 +159,26 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 
 	@Override
 	public List<String[]> getStatisticsHeader() {
-		List<String[]> columnValues = new ArrayList<String[]>();
-		User currentUser = UserThreadLocal.getCurrentUser();
-		Locale userLocale = currentUser.getLocale();
-		
-		for(StatisticsColumn column : StatisticsColumn.values()) {
-			String[] columnValue = new String[]{column.value(), getLanguageService().getMessage(column.value(), userLocale)};
-			columnValues.add(columnValue);
-		}
-
+		List<String[]> columnValues = new ArrayList<String[]>(1);
+		columnValues.add(new String[]{StatisticsColumn.PROJECT_FOUNDING.value(), getLanguageService().getMessage(StatisticsColumn.PROJECT_FOUNDING.value())});
 		return columnValues;
 	}
 	
+	/* 
+	 * public download interface.
+	 */
 	public void exportResult(String[] searchParams, OutputStream os) {
 		ExportDao exportDao = (ExportDao)researchProjectDao;
 		List<String> exportHeader = getExportTableHeader();
-
 		Map<String, Object> searchObject = convertStringToObj(searchParams);
+		
 		super.exportResult(TARGET_TYPE, exportHeader, searchObject, os, exportDao);
 	}
 	
+	
+	/* 
+	 * used for export the download value.
+	 */
 	public Object[] convertPojoToObject(Object[] pojos) {
 		Object[] objectValues = new Object[12];
 		int index = 0;
@@ -263,5 +200,11 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 		return objectValues;
 	}
 
+	public ResearchProjectDao getResearchProjectDao() {
+		return researchProjectDao;
+	}
 
+	public void setResearchProjectDao(ResearchProjectDao researchProjectDao) {
+		this.researchProjectDao = researchProjectDao;
+	}
 }

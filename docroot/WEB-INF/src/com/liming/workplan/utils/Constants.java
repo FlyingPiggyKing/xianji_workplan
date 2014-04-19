@@ -31,7 +31,7 @@ public interface Constants {
 	public static final String WorkPlanNode_STATUS_REJECTED = "rejected";
 	public static final String WorkplanNode_STATUS = "status";
 	
-	public static final String ResearchProjectServiceImpl_SEP = ",";
+	public static final String VALUE_SEP = ",";
 	public static final String ResearchProjectServiceImpl_NODE_TYPE = "ResearchProject";
 	
 	public static final String WorkflowNode_NODE_STATUS_ACTIVE = "active";

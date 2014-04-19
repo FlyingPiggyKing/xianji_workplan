@@ -9,7 +9,9 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.MessageSource;
 
+import com.liferay.portal.model.User;
 import com.liming.workplan.service.LanguageService;
+import com.liming.workplan.utils.UserThreadLocal;
 
 public class LanguageServiceImpl implements LanguageService, ApplicationContextAware {
 	
@@ -25,6 +27,12 @@ public class LanguageServiceImpl implements LanguageService, ApplicationContextA
 	@Override
 	public String getMessage(String key, Locale locale) {
 		return resources.getMessage(key, null, key, locale);
+	}
+	
+	public String getMessage(String key) {
+		User currentUser = UserThreadLocal.getCurrentUser();
+		Locale userLocale = currentUser.getLocale();
+		return resources.getMessage(key, null, key, userLocale);
 	}
 	
 	public List<String> getMessageForRow(List<String> row, Locale locale) {
@@ -43,6 +51,17 @@ public class LanguageServiceImpl implements LanguageService, ApplicationContextA
 			messageRows.add(getMessageForRow(messageRow, locale));
 		}
 		return messageRows;
+	}
+	
+	public List<String[]> getLocalTableHeader(List<String> header) {
+		User currentUser = UserThreadLocal.getCurrentUser();
+		Locale userLocale = currentUser.getLocale();
+		List<String[]> localHeader = new ArrayList<String[]>(header.size());
+		for(String column : header) {
+			String[] columnValue = new String[]{column, getMessage(column, userLocale)};
+			localHeader.add(columnValue);
+		}
+		return localHeader;
 	}
 
 }

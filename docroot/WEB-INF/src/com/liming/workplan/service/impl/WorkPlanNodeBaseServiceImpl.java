@@ -69,6 +69,18 @@ public abstract class WorkPlanNodeBaseServiceImpl {
         }
 	}
 	
+	protected enum UnPublishColumn {
+		STATUS("status");
+		
+		private final String value;
+        private UnPublishColumn(String value) {
+            this.value = value;
+        }
+        public String value() {
+        	return value;
+        }
+	}
+	
 	public WorkflowService getWorkflowService() {
 		return workflowService;
 	}
@@ -96,25 +108,54 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 		row.put(TableColumn.TYPE_DESE.value(), node.getAttachment().getTypeDesc());
 	}
 	
-	protected List<String[]> getTableHeader() {
-		List<String[]> columnValues = new ArrayList<String[]>();
-		User currentUser = UserThreadLocal.getCurrentUser();
-		Locale userLocale = currentUser.getLocale();
+	public List<String[]> getPublishedTableHeader() {
+		LanguageService service = getLanguageService();
 		
-		columnValues.add(new String[]{TableColumn.TYPE_DESE.value(), getLanguageService().getMessage(TableColumn.TYPE_DESE.value(), userLocale)});
-		columnValues.add(new String[]{TableColumn.ATTACHMENT_NAME.value(), getLanguageService().getMessage(TableColumn.ATTACHMENT_NAME.value(), userLocale)});
+		List<String> tableHeader = getTableHeader();
+		List<String> baseTableHeader = getBaseTableHeader();
+		
+		List<String[]> columnValues = new ArrayList<String[]>(tableHeader.size() + baseTableHeader.size());
+		
+		columnValues.addAll(service.getLocalTableHeader(tableHeader));
+		columnValues.addAll(service.getLocalTableHeader(baseTableHeader));
+
 		return columnValues;
 	}
 	
-	protected List<String> getExportHeader() {
+	public List<String[]> getUnPublishedTableHeader() {
+		LanguageService service = getLanguageService();
+	
+		List<String> tableHeader = getTableHeader();
+		List<String> baseTableHeader = getBaseTableHeader();
+		
+		List<String[]> columnValues = new ArrayList<String[]>(tableHeader.size() + baseTableHeader.size() + 1);
+		
+		columnValues.add(new String[]{UnPublishColumn.STATUS.value(), service.getMessage(UnPublishColumn.STATUS.value())});	
+		columnValues.addAll(service.getLocalTableHeader(tableHeader));
+		columnValues.addAll(service.getLocalTableHeader(baseTableHeader));
+		
+		return columnValues;
+	}
+	
+	public List<String> getExportTableHeader() {
 		List<String> columnValues = new ArrayList<String>();
-//		User currentUser = UserThreadLocal.getCurrentUser();
-//		Locale userLocale = currentUser.getLocale();
+		
+		columnValues.addAll(getTableHeader());
+		columnValues.addAll(getBaseTableHeader());
+		return columnValues;
+	}
+	
+	protected abstract List<String> getTableHeader();
+	
+	protected List<String> getBaseTableHeader() {
+		List<String> columnValues = new ArrayList<String>();
 		
 		columnValues.add(TableColumn.TYPE_DESE.value());
 		columnValues.add(TableColumn.ATTACHMENT_NAME.value());
 		return columnValues;
 	}
+	
+	
 
 	public void setWorkflowService(WorkflowService workflowService) {
 		this.workflowService = workflowService;
