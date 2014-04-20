@@ -11,6 +11,15 @@ YUI.add("workflowTableWidget", function(Y) {
 	WorkflowNodeTable.BUTTON_REJECT = '<button id="rejectButton">拒绝</button>';
 	WorkflowNodeTable.CHECK_COLUMN = 'checkbox';
 	WorkflowNodeTable.DIALOG_CONTAINER = '<div class="dialogContainer" />';
+	WorkflowNodeTable.SELECT_TYPE_TEMPLATE = '<select>' +
+		'<option name=\'ResearchProject\'>科研项目</option>' + 
+		'<option name=\'ResearchAchievement\'>科研成果</option>' + 
+		'<option name=\'test\'>组织学术会议</option>' + 
+		'<option name=\'test\'>参加学术会议和培训进修</option>' + 
+		'<option name=\'test\'>开展学术交流</option>' + 
+		'<option name=\'test\'>学术传播</option>' + 
+		'<option name=\'test\'>担任专家</option>' + 
+		'</select>';
 	
 	WorkflowNodeTable.ATTRS = {
 		approveButton : {value:null},
@@ -61,6 +70,12 @@ YUI.add("workflowTableWidget", function(Y) {
 	    	return params;
 	    },
 	    
+	    _renderPreUIAdditional : function() {
+	    	var contentBox =  this.get('contentBox');
+	    	this.typeSelector = Y.Node.create(WorkflowNodeTable.SELECT_TYPE_TEMPLATE);
+			contentBox.appendChild(this.typeSelector);
+	    },
+	    
 	    _renderUIAdditional : function() {
 	    	var contentBox = this.get('contentBox');
 	    	
@@ -90,6 +105,7 @@ YUI.add("workflowTableWidget", function(Y) {
 	    	this.get('table').delegate('click', Y.bind(this._selectRow, this), '.yui3-datatable-data .rowSelect');
 	    	this.get('approveButton').on('click', Y.bind(this._onApproveButtonClick, this));
 	    	this.get('rejectButton').on('click', Y.bind(this._onRejectButtonClick, this));
+	    	this.typeSelector.on('change', Y.bind(this._afterTypeChange, this));
 	    },
 	    
 	    
@@ -103,6 +119,16 @@ YUI.add("workflowTableWidget", function(Y) {
 	    	   table.getRecord(e.currentTarget.get("id")).set(WorkflowNodeTable.CHECK_COLUMN, false);
 	       }
 	       
+	    },
+	    
+	    _afterTypeChange : function() {
+	    	var selIndex = this.typeSelector.get("selectedIndex");
+	    	var typeOpts = this.typeSelector.get("options");
+	    	var selectedType = typeOpts.item(selIndex).getAttribute("name");
+	    	if("test" != selectedType) {
+	    		this.set('nodeType', selectedType);
+		    	this.refreshFirstPage();
+	    	}
 	    },
 	    
 	    _onApproveButtonClick: function(e){
@@ -174,7 +200,7 @@ YUI.add("workflowTableWidget", function(Y) {
 		},
 		
 		refreshFirstPage : function() {
-	    	this.get('data').load({'pageNumber':1});
+	    	this.get('data').load({'pageNumber':1, 'header':true});
 	        this._getTotalPageNumber();
 	    }
 	});

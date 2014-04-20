@@ -70,10 +70,11 @@ public class WorkflowManagementPortlet extends MVCPortlet {
 			String sortColumn = resourceRequest.getParameter("sort");
 			String sortOrder = resourceRequest.getParameter("order");
 			List<Object[]> resultEnitity = null;
+			String dataType = resourceRequest.getParameter("dataType");
 			if("undefined".equals(sortColumn) || "null".equals(sortColumn)) {
-				resultEnitity = workflowService.getWorkflowsByRoleAndType("ResearchProject", pageNumber, pageSize, null, null);
+				resultEnitity = workflowService.getWorkflowsByRoleAndType(dataType, pageNumber, pageSize, null, null);
 			} else {
-				resultEnitity = workflowService.getWorkflowsByRoleAndType("ResearchProject", pageNumber, pageSize, sortColumn, sortOrder);
+				resultEnitity = workflowService.getWorkflowsByRoleAndType(dataType, pageNumber, pageSize, sortColumn, sortOrder);
 			}
 			
 			resourceRequest.getPortletSession().setAttribute(WORKFLOW_ENTITY, resultEnitity);

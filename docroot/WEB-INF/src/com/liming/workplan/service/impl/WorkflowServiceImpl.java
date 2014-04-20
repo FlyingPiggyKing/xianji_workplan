@@ -15,9 +15,11 @@ import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liferay.portal.service.RoleServiceUtil;
 import com.liming.workplan.dao.WorkflowDao;
+import com.liming.workplan.model.pojo.ResearchAchievement;
 import com.liming.workplan.model.pojo.ResearchProject;
 import com.liming.workplan.model.pojo.WorkflowNode;
 import com.liming.workplan.service.LanguageService;
+import com.liming.workplan.service.ResearchAchievementService;
 import com.liming.workplan.service.ResearchProjectService;
 import com.liming.workplan.service.WorkflowService;
 import com.liming.workplan.utils.Constants;
@@ -29,7 +31,9 @@ public class WorkflowServiceImpl implements WorkflowService {
 	private List<String> roleOrderList;
 	private WorkflowDao workflowDao;
 	private ResearchProjectService researchProjectService;
+	private ResearchAchievementService researchAchievementService;
 	private final String NODE_TYPE_RESEARCH_PROJECT = "ResearchProject";
+	private final String NODE_TYPE_RESEARCH_ACHIEVEMENT = "ResearchAchievement";
 	private LanguageService languageService;
 	private enum WorkflowColumn {
 		APPROVER("approver"),
@@ -68,10 +72,10 @@ public class WorkflowServiceImpl implements WorkflowService {
 		if(WorkflowColumn.APPROVEDDATE.value().equals(sortColumn) || WorkflowColumn.APPROVER.value().equals(sortColumn)) {
 			isSortByWorkflowColumn = true;
 		}
-			workplanRows = workflowDao.getWorkplanWSByRole(roleId, nodeType, pageNumber, pageSize, sortColumn, sortOrder, isSortByWorkflowColumn);
-			
-			List<Map<String, String>> displayData = convertNodeToData(nodeType, workplanRows);
-			WorkplanDataThreadLocal.setDisplayData(nodeType, displayData);
+		workplanRows = workflowDao.getWorkplanWSByRole(roleId, nodeType, pageNumber, pageSize, sortColumn, sortOrder, isSortByWorkflowColumn);
+		
+		List<Map<String, String>> displayData = convertNodeToData(nodeType, workplanRows);
+		WorkplanDataThreadLocal.setDisplayData(nodeType, displayData);
 //		}
 		
 		return workplanRows;
@@ -202,6 +206,15 @@ public class WorkflowServiceImpl implements WorkflowService {
 				fillWorkflowCell((WorkflowNode)entites[1], valueMap);
 				result.add(valueMap);
 			}
+		} else if(NODE_TYPE_RESEARCH_ACHIEVEMENT.equals(nodeType)) {
+			cellCount += researchAchievementService.getPublishedTableHeader().size();
+			for(int rowIndex = 0 ; rowIndex < workplanPojosRows.size(); rowIndex++) {
+				Object[] entites = (Object[])workplanPojosRows.get(rowIndex);
+				Map<String, String> valueMap = new HashMap<String, String>(cellCount);
+				researchAchievementService.fillDisplayTable((ResearchAchievement)entites[0], valueMap);
+				fillWorkflowCell((WorkflowNode)entites[1], valueMap);
+				result.add(valueMap);
+			}
 		}
 		
 		return result;
@@ -248,6 +261,8 @@ public class WorkflowServiceImpl implements WorkflowService {
 		List<String[]> workplanHeader = null;
 		if(NODE_TYPE_RESEARCH_PROJECT.equals(nodeType)) {
 			workplanHeader = researchProjectService.getPublishedTableHeader();
+		} else if(NODE_TYPE_RESEARCH_ACHIEVEMENT.equals(nodeType)) {
+			workplanHeader = researchAchievementService.getPublishedTableHeader();
 		}
 		List<String[]> workflowHeader = new ArrayList<String[]>(workplanHeader.size() + WorkflowColumn.values().length);
 		workflowHeader.addAll(workplanHeader);
@@ -265,6 +280,15 @@ public class WorkflowServiceImpl implements WorkflowService {
 
 	public void setLanguageService(LanguageService languageService) {
 		this.languageService = languageService;
+	}
+
+	public ResearchAchievementService getResearchAchievementService() {
+		return researchAchievementService;
+	}
+
+	public void setResearchAchievementService(
+			ResearchAchievementService researchAchievementService) {
+		this.researchAchievementService = researchAchievementService;
 	}
 
 }
