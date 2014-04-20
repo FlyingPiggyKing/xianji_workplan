@@ -16,6 +16,19 @@
 		<css-class-wrapper>WorkPlanManagement-portlet</css-class-wrapper>
 	</portlet>
 	<portlet>
+		<portlet-name>ResearchAchievemet</portlet-name>
+		<icon>/icon.png</icon>
+		<requires-namespaced-parameters>false</requires-namespaced-parameters>
+		<header-portal-css>/html/js/aui/cssgrids/cssgrids-min.css</header-portal-css>
+		<header-portlet-css>/css/main.css</header-portlet-css>
+		<footer-portlet-javascript>/js/BaseTableWidget.js</footer-portlet-javascript>
+		<footer-portlet-javascript>/js/WorkplanNodeGeneratorHelper.js</footer-portlet-javascript>
+		<footer-portlet-javascript>/js/PublishedWorkPlanNodeTableWidget.js</footer-portlet-javascript>
+		<footer-portlet-javascript>/js/MyWorkPlanNodeTableWidget.js</footer-portlet-javascript>
+		<footer-portlet-javascript>/js/RecordAdding.js</footer-portlet-javascript>
+		<css-class-wrapper>ResearchAchievemet-portlet</css-class-wrapper>
+	</portlet>
+	<portlet>
 		<portlet-name>WorkflowManagement</portlet-name>
 		<icon>/icon.png</icon>
 		<requires-namespaced-parameters>false</requires-namespaced-parameters>

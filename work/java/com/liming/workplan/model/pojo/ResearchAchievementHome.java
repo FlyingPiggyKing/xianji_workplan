@@ -11,13 +11,14 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Example;
 
 /**
- * Home object for domain model class WorkflowNode.
- * @see com.liming.workplan.model.pojo.WorkflowNode
+ * Home object for domain model class ResearchAchievement.
+ * @see com.liming.workplan.model.pojo.ResearchAchievement
  * @author Hibernate Tools
  */
-public class WorkflowNodeHome {
+public class ResearchAchievementHome {
 
-	private static final Log log = LogFactory.getLog(WorkflowNodeHome.class);
+	private static final Log log = LogFactory
+			.getLog(ResearchAchievementHome.class);
 
 	private final SessionFactory sessionFactory = getSessionFactory();
 
@@ -32,8 +33,8 @@ public class WorkflowNodeHome {
 		}
 	}
 
-	public void persist(WorkflowNode transientInstance) {
-		log.debug("persisting WorkflowNode instance");
+	public void persist(ResearchAchievement transientInstance) {
+		log.debug("persisting ResearchAchievement instance");
 		try {
 			sessionFactory.getCurrentSession().persist(transientInstance);
 			log.debug("persist successful");
@@ -43,8 +44,8 @@ public class WorkflowNodeHome {
 		}
 	}
 
-	public void attachDirty(WorkflowNode instance) {
-		log.debug("attaching dirty WorkflowNode instance");
+	public void attachDirty(ResearchAchievement instance) {
+		log.debug("attaching dirty ResearchAchievement instance");
 		try {
 			sessionFactory.getCurrentSession().saveOrUpdate(instance);
 			log.debug("attach successful");
@@ -54,8 +55,8 @@ public class WorkflowNodeHome {
 		}
 	}
 
-	public void attachClean(WorkflowNode instance) {
-		log.debug("attaching clean WorkflowNode instance");
+	public void attachClean(ResearchAchievement instance) {
+		log.debug("attaching clean ResearchAchievement instance");
 		try {
 			sessionFactory.getCurrentSession().lock(instance, LockMode.NONE);
 			log.debug("attach successful");
@@ -65,8 +66,8 @@ public class WorkflowNodeHome {
 		}
 	}
 
-	public void delete(WorkflowNode persistentInstance) {
-		log.debug("deleting WorkflowNode instance");
+	public void delete(ResearchAchievement persistentInstance) {
+		log.debug("deleting ResearchAchievement instance");
 		try {
 			sessionFactory.getCurrentSession().delete(persistentInstance);
 			log.debug("delete successful");
@@ -76,10 +77,10 @@ public class WorkflowNodeHome {
 		}
 	}
 
-	public WorkflowNode merge(WorkflowNode detachedInstance) {
-		log.debug("merging WorkflowNode instance");
+	public ResearchAchievement merge(ResearchAchievement detachedInstance) {
+		log.debug("merging ResearchAchievement instance");
 		try {
-			WorkflowNode result = (WorkflowNode) sessionFactory
+			ResearchAchievement result = (ResearchAchievement) sessionFactory
 					.getCurrentSession().merge(detachedInstance);
 			log.debug("merge successful");
 			return result;
@@ -89,12 +90,13 @@ public class WorkflowNodeHome {
 		}
 	}
 
-	public WorkflowNode findById(int id) {
-		log.debug("getting WorkflowNode instance with id: " + id);
+	public ResearchAchievement findById(int id) {
+		log.debug("getting ResearchAchievement instance with id: " + id);
 		try {
-			WorkflowNode instance = (WorkflowNode) sessionFactory
-					.getCurrentSession().get(
-							"com.liming.workplan.model.pojo.WorkflowNode", id);
+			ResearchAchievement instance = (ResearchAchievement) sessionFactory
+					.getCurrentSession()
+					.get("com.liming.workplan.model.pojo.ResearchAchievement",
+							id);
 			if (instance == null) {
 				log.debug("get successful, no instance found");
 			} else {
@@ -107,13 +109,13 @@ public class WorkflowNodeHome {
 		}
 	}
 
-	public List findByExample(WorkflowNode instance) {
-		log.debug("finding WorkflowNode instance by example");
+	public List findByExample(ResearchAchievement instance) {
+		log.debug("finding ResearchAchievement instance by example");
 		try {
 			List results = sessionFactory
 					.getCurrentSession()
 					.createCriteria(
-							"com.liming.workplan.model.pojo.WorkflowNode")
+							"com.liming.workplan.model.pojo.ResearchAchievement")
 					.add(Example.create(instance)).list();
 			log.debug("find by example successful, result size: "
 					+ results.size());

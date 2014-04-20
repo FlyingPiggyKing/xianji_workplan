@@ -1,12 +1,14 @@
 package com.liming.workplan.service.aop;
 
-import org.apache.log4j.Logger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 public class TransactionAOP {
-	protected final static Logger log = Logger.getLogger(TransactionAOP.class);
+	protected final static Logger log = Logger.getLogger(TransactionAOP.class.getName());
 	private SessionFactory sessionFactory;
 	
 	public Object doInTransaction(ProceedingJoinPoint pjp) {
@@ -22,33 +24,33 @@ public class TransactionAOP {
 				session.beginTransaction();
 			}
 			
-			if(log.isDebugEnabled()) {
+			if(log.isLoggable(Level.FINE)) {
 				if(needOpen) {
-					log.debug("Before Transaction-" + pjp.toLongString() + " begin transaction.");
+					log.fine("Before Transaction-" + pjp.toLongString() + " begin transaction.");
 				} else {
-					log.debug("Before Transaction-" + pjp.toLongString());
+					log.fine("Before Transaction-" + pjp.toLongString());
 				}
 			}
 			retVal = pjp.proceed();
 			long afterExe = System.currentTimeMillis();
-			if(log.isDebugEnabled()) {
+			if(log.isLoggable(Level.FINE)) {
 				if(needOpen) {
 					long time = afterExe - begin;
-					log.debug("Execution Service consume: " + time);
+					log.fine("Execution Service consume: " + time);
 				}
 				
 			}
 			if(needOpen) {
 				session.getTransaction().commit();
 			}
-			if(log.isDebugEnabled()) {
+			if(log.isLoggable(Level.FINE)) {
 				if(needOpen) {
 					long afterTransactionCommit = System.currentTimeMillis();
 					long time = afterTransactionCommit - afterExe;
-					log.debug("Commit transaction consume: " + time);
-					log.debug("After Transaction-" + pjp.toLongString() + " close transaction.");
+					log.fine("Commit transaction consume: " + time);
+					log.fine("After Transaction-" + pjp.toLongString() + " close transaction.");
 				} else {
-					log.debug("After Transaction-" + pjp.toLongString());
+					log.fine("After Transaction-" + pjp.toLongString());
 				}
 				
 			}

@@ -17,7 +17,7 @@ public abstract class WorlplanBasePortlet extends MVCPortlet  {
 	public void serveResource(
 			ResourceRequest resourceRequest, ResourceResponse resourceResponse)
 		throws IOException, PortletException {
-		String cmd = resourceRequest.getParameter(Constants.WorkPlanManagementPortlet_RESOURCE_CMD);
+		String cmd = resourceRequest.getParameter(Constants.WorlplanBasePortlet_RESOURCE_CMD);
 		boolean isSuccessed = UserThreadLocal.setCurrentUser(PortalUtil.getHttpServletRequest(resourceRequest));
 		if(!isSuccessed) {
 			return;

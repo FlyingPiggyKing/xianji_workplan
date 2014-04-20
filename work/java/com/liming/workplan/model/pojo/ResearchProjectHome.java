@@ -1,6 +1,6 @@
 package com.liming.workplan.model.pojo;
 
-// Generated 2014-4-19 16:07:02 by Hibernate Tools 4.0.0
+// Generated 2014-4-20 16:56:41 by Hibernate Tools 4.0.0
 
 import java.util.List;
 import javax.naming.InitialContext;

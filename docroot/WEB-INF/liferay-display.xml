@@ -4,6 +4,7 @@
 <display>
 	<category name="category.sample">
 		<portlet id="WorkPlanManagement" />
-		<portlet id="WorkflowManagement" />
+		<portlet id="ResearchAchievemet" />
+		<portlet id="WorkflowManagement" />		
 	</category>
 </display>

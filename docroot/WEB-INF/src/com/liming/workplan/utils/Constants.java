@@ -8,10 +8,11 @@ public interface Constants {
 	public static final String WorlplanBasePortlet_RESOURCE_CMD_LOAD_PUBLISHED_NODES = "getPublishedNodes";
 	public static final String WorlplanBasePortlet_RESOURCE_CMD_EXPORT = "export";
 	public static final String WorlplanBasePortlet_RESOURCE_CMD_LOAD_UNPUBLISHED_NODES = "getUnPublishedNodes";
+	public static final String WorlplanBasePortlet_PARAM_IDS_KEY = "ids";	
+	public static final String WorlplanBasePortlet_RESOURCE_CMD = "resource_cmd";
 	
-	public static final String WorkPlanManagementPortlet_RESOURCE_CMD = "resource_cmd";
 	public static final String WorkPlanManagementPortlet_RESOURCE_CMD_STATISTICS = "statistics";
-	public static final String WorkPlanManagementPortlet_PARAM_IDS_KEY = "ids";
+	
 	
 	public static final String WorkflowManagementPortlet_RESOURCE_CMD = "resource_cmd";
 	public static final String WorkflowManagementPortlet_RESOURCE_CMD_APPROVE = "approve";

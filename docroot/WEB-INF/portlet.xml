@@ -33,6 +33,37 @@
 		</security-role-ref>
 	</portlet>
 	<portlet>
+		<portlet-name>ResearchAchievemet</portlet-name>
+		<display-name>Research Achievement</display-name>
+		<portlet-class>com.liming.workplan.web.portlets.ResearchAchievementPortlet</portlet-class>
+		<init-param>
+			<name>view-template</name>
+			<value>/jsp/WorkPlanManagement/view.jsp</value>
+		</init-param>
+		<expiration-cache>0</expiration-cache>
+		<supports>
+			<mime-type>text/html</mime-type>
+		</supports>
+		<resource-bundle>content.Language</resource-bundle>
+		<portlet-info>
+			<title>Research Achievement</title>
+			<short-title>Research Achievement</short-title>
+			<keywords>Research Achievement</keywords>
+		</portlet-info>
+		<security-role-ref>
+			<role-name>administrator</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>guest</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>power-user</role-name>
+		</security-role-ref>
+		<security-role-ref>
+			<role-name>user</role-name>
+		</security-role-ref>
+	</portlet>
+	<portlet>
 		<portlet-name>WorkflowManagement</portlet-name>
 		<display-name>Workflow Management</display-name>
 		<portlet-class>com.liming.workplan.web.portlets.WorkflowManagementPortlet</portlet-class>

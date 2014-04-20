@@ -14,6 +14,10 @@ public class BeanLocator {
 		return (ResearchProjectService)ctx.getBean(ResearchProjectService.class.getName());
 	}
 	
+	public static ResearchAchievementService getResearchAchievementService() {
+		return (ResearchAchievementService)ctx.getBean(ResearchAchievementService.class.getName());
+	}
+	
 	public static WorkflowService getWorkflowService() {
 		return (WorkflowService)ctx.getBean(WorkflowService.class.getName());
 	}

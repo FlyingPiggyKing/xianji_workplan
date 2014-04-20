@@ -19,5 +19,6 @@
     	</bean>
         <import resource="dataresource-hibernate.xml"/>
         <import resource="researchproject-service.xml"/>
+        <import resource="researchAchievement-service.xml"/>
         <import resource="workflow-service.xml"/>
 </beans>
