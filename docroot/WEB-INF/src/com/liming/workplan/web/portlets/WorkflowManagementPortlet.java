@@ -94,12 +94,7 @@ public class WorkflowManagementPortlet extends MVCPortlet {
 			Long countL = workflowService.countWorkflow(dataType);
 			JSONObject count = JsonTool.convertNumberToJson("count", countL);
 			resourceResponse.getWriter().write(count.toString());
-		}
-		
-		
-		
-		
-		
+		}	
 	}
 	
 	@Override

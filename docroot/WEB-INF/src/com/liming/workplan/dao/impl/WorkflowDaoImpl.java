@@ -9,6 +9,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 
 import com.liming.workplan.dao.WorkflowDao;
+import com.liming.workplan.model.pojo.WorkPlanNode;
 import com.liming.workplan.model.pojo.WorkflowNode;
 import com.liming.workplan.utils.Constants;
 
@@ -24,36 +25,6 @@ public class WorkflowDaoImpl implements WorkflowDao {
 	
 	private SessionFactory sessionFactory;
 
-//	@Override
-//	public List<Object[]> getWorkplanWSByRole(long roleId, String nodeType, List<String> columns, List<String> workflowColumns, int pageNumber, int pageSize) {
-//		Session session = sessionFactory.getCurrentSession();
-//		StringBuilder hqlBuilder = new StringBuilder();
-//		hqlBuilder.append("select ");
-//		for(int colIndex = 0; colIndex < columns.size(); colIndex++) {
-//			hqlBuilder.append("wp." + columns.get(colIndex));
-//			hqlBuilder.append(", ");
-//		}
-//		for(int colIndex = 0; colIndex < workflowColumns.size(); colIndex++) {
-//			hqlBuilder.append("wf." + workflowColumns.get(colIndex));
-//			if(colIndex != workflowColumns.size() -1) {
-//				hqlBuilder.append(", ");
-//			}
-//		}
-//		hqlBuilder.append(" from ");
-//		hqlBuilder.append(nodeType + " wp inner join wp.workflowNode wf where wf.approvingRoleId = :"
-//			+ PARAM_ROLE_ID + " and wf.nodeType = :" + PARAM_NODE_TYPE);
-//		if(log.isDebugEnabled()) {
-//			log.debug(hqlBuilder.toString());
-//		}
-//		
-//		Query query = session.createQuery(hqlBuilder.toString());
-//		query.setParameter(PARAM_ROLE_ID, roleId);
-//		query.setParameter(PARAM_NODE_TYPE, nodeType);
-//		query.setFirstResult(pageSize * (pageNumber - 1));
-//		query.setMaxResults(pageSize);
-//		List<Object[]> result = (List<Object[]>)query.list();
-//		return result;
-//	}
 	
 	@Override
 	public List<Object[]> getWorkplanWSByRole(long roleId, String nodeType, int pageNumber, int pageSize, String sortColumn, String sortOrder, boolean isSortByWFCol) {
@@ -77,6 +48,13 @@ public class WorkflowDaoImpl implements WorkflowDao {
 		query.setMaxResults(pageSize);
 		List<Object[]> result = (List<Object[]>)query.list();
 		return result;
+	}
+	
+	public void updateWorkplanNodes(List<WorkPlanNode> nodes) {
+		Session session = getSessionFactory().getCurrentSession();
+		for(WorkPlanNode node : nodes) {
+			session.update(node);
+		}
 	}
 	
 	private void appendSortClause(String sortColumn, String order,

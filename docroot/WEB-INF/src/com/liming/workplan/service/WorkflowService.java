@@ -6,7 +6,6 @@ import java.util.Map;
 import com.liming.workplan.model.pojo.WorkflowNode;
 
 public interface WorkflowService {
-	public void submitWorkflow(WorkflowNode newNode);
 	public List<String> getRoleOrderList();
 	public List<Object[]> getWorkflowsByRoleAndType(String nodeType, int pageNumber, int pageSize, String sortColumn, String sortOrder);
 	public List<Map<String, String>> convertNodeToData(String nodeType, List<Object[]> workplanPojosRows);

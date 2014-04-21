@@ -13,10 +13,10 @@ import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.UserGroupRole;
 import com.liferay.portal.service.RoleLocalServiceUtil;
-import com.liferay.portal.service.RoleServiceUtil;
 import com.liming.workplan.dao.WorkflowDao;
 import com.liming.workplan.model.pojo.ResearchAchievement;
 import com.liming.workplan.model.pojo.ResearchProject;
+import com.liming.workplan.model.pojo.WorkPlanNode;
 import com.liming.workplan.model.pojo.WorkflowNode;
 import com.liming.workplan.service.LanguageService;
 import com.liming.workplan.service.ResearchAchievementService;
@@ -48,26 +48,14 @@ public class WorkflowServiceImpl implements WorkflowService {
         }
 	}
 
-	@Override
-	public void submitWorkflow(WorkflowNode newNode) {
-		// TODO Auto-generated method stub
-		
-	}
-	
+
 	public List<Object[]> getWorkflowsByRoleAndType(String nodeType, int pageNumber, int pageSize, String sortColumn, String sortOrder) {
 		long roleId = getCurrentUserRole();
 		List<Object[]> workplanRows  = new ArrayList<Object[]>();
 		if(roleId == -1) {
 			return workplanRows;
 		}
-//		List<String> workflowCells = new ArrayList(WorkflowColumn.values().length);
-//		for(WorkflowColumn cell : WorkflowColumn.values()) {
-//			workflowCells.add(cell.value());
-//		}
-//		List<String> workplanHeader = null;
-//		List<Object[]> workplanRows = null;
-		
-//		if(NODE_TYPE_RESEARCH_PROJECT.equals(nodeType)) {
+
 		boolean isSortByWorkflowColumn = false;
 		if(WorkflowColumn.APPROVEDDATE.value().equals(sortColumn) || WorkflowColumn.APPROVER.value().equals(sortColumn)) {
 			isSortByWorkflowColumn = true;
@@ -76,7 +64,6 @@ public class WorkflowServiceImpl implements WorkflowService {
 		
 		List<Map<String, String>> displayData = convertNodeToData(nodeType, workplanRows);
 		WorkplanDataThreadLocal.setDisplayData(nodeType, displayData);
-//		}
 		
 		return workplanRows;
 	}
@@ -108,84 +95,80 @@ public class WorkflowServiceImpl implements WorkflowService {
 	
 	public void approveWorkflow(String nodeType, String ids[], List<Object[]> loadedEntities) {
 		User currentUser = UserThreadLocal.getCurrentUser();
-		List<ResearchProject> changedNodes = new ArrayList<ResearchProject>();
+		List<WorkPlanNode> changedNodes = new ArrayList<WorkPlanNode>();
 		for(String id : ids) {
 			for(Object[] entity : loadedEntities) {
-				
-				if(NODE_TYPE_RESEARCH_PROJECT.equals(nodeType)) {
-					ResearchProject researchProject = (ResearchProject )entity[0];
-					if(researchProject.getNodeId() == Integer.valueOf(id)) {
-						long approvingRoleId = researchProject.getWorkflowNode().getApprovingRoleId();
-						String approvingRoleName = null;
-						try {
-							
-							//locate the current workflow status
-							Role role = RoleLocalServiceUtil.getRole(approvingRoleId);
-							approvingRoleName = role.getName();
-							
-							int currentRoleIndex = -1;
-							for(int roleIndex = 0; roleIndex < roleOrderList.size(); roleIndex++) {
-								if(roleOrderList.get(roleIndex).equals(approvingRoleName)) {
-									currentRoleIndex = roleIndex;
-									break;
-								}
-							}
-							//change workflow status if necessory
-							if(currentRoleIndex != -1) {
-								WorkflowNode workflowNode = researchProject.getWorkflowNode();
-								if(currentRoleIndex < roleOrderList.size() - 1) {
-									Role nextApprovingRole = RoleLocalServiceUtil.getRole(currentUser.getCompanyId(), roleOrderList.get(currentRoleIndex + 1));
-									workflowNode.setApprovingRoleId(nextApprovingRole.getRoleId());
-									
-								} else {
-									workflowNode.setStatus(Constants.WorkflowNode_NODE_STATUS_COMPLETED);
-									researchProject.setStatus(Constants.WorkPlanNode_STATUS_PUBLISH);
-								}
-								workflowNode.setApprover(currentUser.getFullName());
-								workflowNode.setApprovedDate(new Date());
-							}
-							changedNodes.add(researchProject);
-						} catch (PortalException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (SystemException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+				WorkPlanNode node = (WorkPlanNode)entity[0];
+				if(node.getNodeId() == Integer.valueOf(id)) {
+					WorkflowNode workflowNode = node.getWorkflowNode();
+					long approvingRoleId = workflowNode.getApprovingRoleId();
+					String approvingRoleName = null;
+					try {
 						
+						//locate the current workflow status
+						Role role = RoleLocalServiceUtil.getRole(approvingRoleId);
+						approvingRoleName = role.getName();
+						
+						int currentRoleIndex = -1;
+						for(int roleIndex = 0; roleIndex < roleOrderList.size(); roleIndex++) {
+							if(roleOrderList.get(roleIndex).equals(approvingRoleName)) {
+								currentRoleIndex = roleIndex;
+								break;
+							}
+						}
+						//change workflow status if necessory
+						if(currentRoleIndex != -1) {
+							if(currentRoleIndex < roleOrderList.size() - 1) {
+								Role nextApprovingRole = RoleLocalServiceUtil.getRole(currentUser.getCompanyId(), roleOrderList.get(currentRoleIndex + 1));
+								workflowNode.setApprovingRoleId(nextApprovingRole.getRoleId());
 								
-						break;
-					}
+							} else {
+								workflowNode.setStatus(Constants.WorkflowNode_NODE_STATUS_COMPLETED);
+								node.setStatus(Constants.WorkPlanNode_STATUS_PUBLISH);
+							}
+							workflowNode.setApprover(currentUser.getFullName());
+							workflowNode.setApprovedDate(new Date());
+							changedNodes.add(node);
+						} else {
+							//current user do not have permission to chage the workflow
+						}
+					} catch (PortalException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (SystemException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}		
+					break;
 				}
 			}
 		}
 		if(changedNodes.size() > 0) {
-			researchProjectService.updateNodes(changedNodes);
+			workflowDao.updateWorkplanNodes(changedNodes);
 		}
 	
 	}
 	
 	public void rejectWorkflow(String nodeType, String ids[], List<Object[]> loadedEntities) {
 		User currentUser = UserThreadLocal.getCurrentUser();
-		List<ResearchProject> changedNodes = new ArrayList<ResearchProject>();
+		List<WorkPlanNode> changedNodes = new ArrayList<WorkPlanNode>();
 		for(String id : ids) {
 			for(Object[] entity : loadedEntities) {
-				if(NODE_TYPE_RESEARCH_PROJECT.equals(nodeType)) {
-					ResearchProject researchProject = (ResearchProject )entity[0];
-					if(researchProject.getNodeId() == Integer.valueOf(id)) {
-						WorkflowNode workflowNode = researchProject.getWorkflowNode();
-						workflowNode.setStatus(Constants.WorkflowNode_NODE_STATUS_COMPLETED);
-						researchProject.setStatus(Constants.WorkPlanNode_STATUS_REJECTED);
-						workflowNode.setApprover(currentUser.getFullName());
-						workflowNode.setApprovedDate(new Date());
-						changedNodes.add(researchProject);
-						break;
-					}
+
+				WorkPlanNode node = (WorkPlanNode)entity[0];
+				if(node.getNodeId() == Integer.valueOf(id)) {
+					WorkflowNode workflowNode = node.getWorkflowNode();
+					workflowNode.setStatus(Constants.WorkflowNode_NODE_STATUS_COMPLETED);
+					node.setStatus(Constants.WorkPlanNode_STATUS_REJECTED);
+					workflowNode.setApprover(currentUser.getFullName());
+					workflowNode.setApprovedDate(new Date());
+					changedNodes.add(node);
+					break;
 				}
 			}
 		}
 		if(changedNodes.size() > 0) {
-			researchProjectService.updateNodes(changedNodes);
+			workflowDao.updateWorkplanNodes(changedNodes);
 		}
 	}
 	
@@ -196,29 +179,20 @@ public class WorkflowServiceImpl implements WorkflowService {
 	
 	public List<Map<String, String>> convertNodeToData(String nodeType, List<Object[]> workplanPojosRows) {
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>(workplanPojosRows.size());
-		int cellCount = WorkflowColumn.values().length;
-		if(NODE_TYPE_RESEARCH_PROJECT.equals(nodeType)) {
-			cellCount += researchProjectService.getPublishedTableHeader().size();
-			for(int rowIndex = 0 ; rowIndex < workplanPojosRows.size(); rowIndex++) {
-				Object[] entites = (Object[])workplanPojosRows.get(rowIndex);
-				Map<String, String> valueMap = new HashMap<String, String>(cellCount);
-				researchProjectService.fillDisplayTable((ResearchProject)entites[0], valueMap);
-				fillWorkflowCell((WorkflowNode)entites[1], valueMap);
-				result.add(valueMap);
-			}
-		} else if(NODE_TYPE_RESEARCH_ACHIEVEMENT.equals(nodeType)) {
-			cellCount += researchAchievementService.getPublishedTableHeader().size();
-			for(int rowIndex = 0 ; rowIndex < workplanPojosRows.size(); rowIndex++) {
-				Object[] entites = (Object[])workplanPojosRows.get(rowIndex);
-				Map<String, String> valueMap = new HashMap<String, String>(cellCount);
-				researchAchievementService.fillDisplayTable((ResearchAchievement)entites[0], valueMap);
-				fillWorkflowCell((WorkflowNode)entites[1], valueMap);
-				result.add(valueMap);
-			}
+		
+		for(int rowIndex = 0 ; rowIndex < workplanPojosRows.size(); rowIndex++) {
+			Object[] entites = (Object[])workplanPojosRows.get(rowIndex);
+			Map<String, String> valueMap = new HashMap<String, String>();
+			fillWorkplanByType(nodeType, entites, valueMap);
+			
+			fillWorkflowCell((WorkflowNode)entites[1], valueMap);
+			result.add(valueMap);
 		}
 		
 		return result;
 	}
+
+	
 	
 	private void fillWorkflowCell(WorkflowNode node, Map<String, String> valueMap) {
 		
@@ -229,8 +203,6 @@ public class WorkflowServiceImpl implements WorkflowService {
 		} else {
 			valueMap.put(WorkflowColumn.APPROVEDDATE.value(), null);
 		}
-		
-		
 	}
 
 	@Override
@@ -259,11 +231,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 	@Override
 	public List<String[]> getWorkflowHeader(String nodeType) {
 		List<String[]> workplanHeader = null;
-		if(NODE_TYPE_RESEARCH_PROJECT.equals(nodeType)) {
-			workplanHeader = researchProjectService.getPublishedTableHeader();
-		} else if(NODE_TYPE_RESEARCH_ACHIEVEMENT.equals(nodeType)) {
-			workplanHeader = researchAchievementService.getPublishedTableHeader();
-		}
+		workplanHeader = getWorkplanHeaderByType(nodeType, workplanHeader);
 		List<String[]> workflowHeader = new ArrayList<String[]>(workplanHeader.size() + WorkflowColumn.values().length);
 		workflowHeader.addAll(workplanHeader);
 		User currentUser = UserThreadLocal.getCurrentUser();
@@ -273,7 +241,26 @@ public class WorkflowServiceImpl implements WorkflowService {
 		}
 		return workflowHeader;
 	}
-
+	
+	private void fillWorkplanByType(String nodeType, Object[] entites,
+			Map<String, String> valueMap) {
+		if(NODE_TYPE_RESEARCH_PROJECT.equals(nodeType)) {
+			researchProjectService.fillDisplayTable((ResearchProject)entites[0], valueMap);
+		} else if(NODE_TYPE_RESEARCH_ACHIEVEMENT.equals(nodeType)) {
+			researchAchievementService.fillDisplayTable((ResearchAchievement)entites[0], valueMap);
+		}
+	}
+	
+	private List<String[]> getWorkplanHeaderByType(String nodeType,
+			List<String[]> workplanHeader) {
+		if(NODE_TYPE_RESEARCH_PROJECT.equals(nodeType)) {
+			workplanHeader = researchProjectService.getPublishedTableHeader();
+		} else if(NODE_TYPE_RESEARCH_ACHIEVEMENT.equals(nodeType)) {
+			workplanHeader = researchAchievementService.getPublishedTableHeader();
+		}
+		return workplanHeader;
+	}
+	
 	public LanguageService getLanguageService() {
 		return languageService;
 	}
