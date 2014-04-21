@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,7 +33,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.User;
-import com.liferay.portal.service.RoleServiceUtil;
+import com.liferay.portal.service.RoleLocalServiceUtil;
 import com.liming.workplan.dao.ExportDao;
 import com.liming.workplan.model.pojo.Attachment;
 import com.liming.workplan.model.pojo.ResearchProject;
@@ -200,7 +199,7 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 		List<String> roleList = workflowService.getRoleOrderList();
 		Role firstRole = null;
 		try {
-			firstRole = RoleServiceUtil.getRole(currentUser.getCompanyId(), roleList.get(0));
+			firstRole = RoleLocalServiceUtil.getRole(currentUser.getCompanyId(), roleList.get(0));
 		} catch (PortalException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
