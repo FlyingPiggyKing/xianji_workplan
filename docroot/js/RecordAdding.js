@@ -13,6 +13,7 @@ YUI.add("recordAdding", function(Y) {
 	};
 	
 	RecordAdding.ROW_CONTAINER = '<div id=\'rowContainer\' class=\'yui3-g\'></div>';
+	RecordAdding.FORM_WRAPER = '<form enctype="multipart/form-data" method="POST"></form>';
 	RecordAdding.ADDING_BUTTON = '<button id=\'addingButton\' class="btn btn-primary">添加记录</button>';
 	RecordAdding.SUBMIT_BUTTON = '<button id=\'submitButton\' class="btn btn-primary">提交</button>';
 	RecordAdding.DIALOG_CONTAINER = '<div class="dialogContainer" />';
@@ -47,7 +48,9 @@ YUI.add("recordAdding", function(Y) {
         	var contentBox = this.get('contentBox');
         	var rowCon = contentBox.one('#rowContainer');
         	var rowWP = this.generator.buildRow(this.rowCount);
-        	rowCon.appendChild(rowWP);
+        	var formCon = Y.Node.create(RecordAdding.FORM_WRAPER);
+        	formCon.append(rowWP);
+        	rowCon.appendChild(formCon);
         	
         	this.rowCount += 1;
         },
@@ -55,13 +58,13 @@ YUI.add("recordAdding", function(Y) {
         _onSubmitClick: function() {
         	var contentBox = this.get('contentBox');
         	var rowCon = contentBox.one('#rowContainer');
-        	var rows = rowCon.all('.rowWrapper');
+        	var rows = rowCon.all('form');
         	
         	var values = [];
         	for(var index = 0; index < rows.size(); index++) {
         		var row = rows.item(index);
-        		var rowValue = this.generator.getRowValue(row);
-        		values.push(rowValue);
+//        		var rowValue = this.generator.getRowValue(row);
+        		values.push(row);
         	}
         	this._submitValues(values);
 //        	rowCon.empty();
@@ -69,15 +72,19 @@ YUI.add("recordAdding", function(Y) {
         },
         
         _submitValues: function(values) {
-        	var postParams = {'values': values, 'resource_cmd':'add'};
+//        	var postParams = {'values': values, 'resource_cmd':'add'};
         	var submitCfg = {
 					method: 'POST',
-					data: postParams,
+					form: {
+			            id: values[0],
+			            upload: true
+			        },
 					on: {
 						complete: Y.bind(this._onSubmitSuccessed, this)
 					}
 			};
-			Y.io(this.get('resourceURL'), submitCfg);
+//        	rowWP.appendChild('<input type="hidden" name="resource_cmd" value="add" />');
+			Y.io(this.get('resourceURL') + "&resource_cmd=add", submitCfg);
         },
         
         _onSubmitSuccessed : function(id, res) {

@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.util.PortalUtil;
 import com.liming.workplan.service.BeanLocator;
 import com.liming.workplan.service.ResearchProjectService;
@@ -35,6 +36,8 @@ public class WorkPlanManagementPortlet extends WorlplanBasePortlet {
 		}
 
 		if(Constants.WorlplanBasePortlet_RESOURCE_CMD_ADD.equals(cmd)) {
+			UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(resourceRequest);
+			String uploadcmd = uploadRequest.getParameter(Constants.WorlplanBasePortlet_RESOURCE_CMD);
 			addNodes(resourceRequest);
 		} else if(Constants.WorlplanBasePortlet_RESOURCE_CMD_LOAD_PUBLISHED_NODES.equals(cmd)) {
 			getPublishedNodes(resourceRequest, resourceResponse);
