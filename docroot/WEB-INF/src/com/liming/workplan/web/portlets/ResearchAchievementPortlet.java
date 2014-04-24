@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.util.PortalUtil;
 import com.liming.workplan.service.BeanLocator;
 import com.liming.workplan.service.ResearchAchievementService;
@@ -23,10 +24,10 @@ import com.liming.workplan.utils.UserThreadLocal;
 
 public class ResearchAchievementPortlet extends WorlplanBasePortlet {
 
-	protected void addNodes(ResourceRequest resourceRequest) {
-		String[] researchAchievementItems = resourceRequest.getParameterValues("values");
-		ResearchAchievementService researchAchievementService = BeanLocator.getResearchAchievementService();
-		researchAchievementService.addResearchAchievement(researchAchievementItems);
+	protected void addNodes(UploadPortletRequest uploadRequest, Map<String, Object> fileParams) {
+//		String[] researchAchievementItems = resourceRequest.getParameterValues("values");
+//		ResearchAchievementService researchAchievementService = BeanLocator.getResearchAchievementService();
+//		researchAchievementService.addResearchAchievement(researchAchievementItems);
 	}
 	
 	protected void getPublishedNodes(ResourceRequest resourceRequest,

@@ -55,16 +55,16 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 	private ResearchProjectDao researchProjectDao;	
 
 	@Override
-	public void addResearchProject(String[] itemArray) {
-		for(String item : itemArray) {
-			String[] values = item.split(Constants.VALUE_SEP);//
-			Map<String, Object> valueObject = convertStringToObj(values);
+	public void addResearchProject(Map<String, Object> paramMap) {
+//		for(String item : itemArray) {
+//			String[] values = item.split(Constants.VALUE_SEP);//
+//			Map<String, Object> valueObject = convertStringToObj(values);
 			ResearchProject researchProject = researchProjectDao.create();
-			initWorkPlanNode(researchProject, valueObject);
-			fillValues(researchProject, "setter", valueObject);
+			initWorkPlanNode(researchProject, paramMap);
+			fillValues(researchProject, "setter", paramMap);
 			
 			researchProjectDao.persist(researchProject);
-		}
+//		}
 	}
 	
 	

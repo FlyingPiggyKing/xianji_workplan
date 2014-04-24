@@ -8,7 +8,7 @@ import java.util.Set;
 import com.liming.workplan.model.pojo.ResearchProject;
 
 public interface ResearchProjectService {
-	public void addResearchProject(String[] itemArray);
+	public void addResearchProject(Map<String, Object> paramMap);
 	public List<Map<String, Object>> getRowConfiguration();
 	public List<Map<String, Object>> getSearchConfiguration();
 	public List<Map<String, String>> loadPublishedResearchProject(String[] searchParams, int pageNumber, int pageSize, String sortColumn, String order);

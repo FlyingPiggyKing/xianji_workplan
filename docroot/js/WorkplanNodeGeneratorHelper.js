@@ -52,6 +52,8 @@ YUI.add("nodeGenerator", function(Y) {
     				cellObject = Y.Node.create('<select name=\"' + col.field + '\">' + options + '</select>');
         		} else if(col.type == "date") {
         			
+        		} else if(col.type == "file") {
+        			cellObject = Y.Node.create('<input name=\"' + col.field + '\" type=\"file\" />');
         		} else {
         			cellObject = Y.Node.create('<input name=\"' + col.field + '\" type=\"text\" />');
         		}

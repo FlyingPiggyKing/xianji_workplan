@@ -16,7 +16,4 @@ public class ResearchProjectServiceUtil {
 		return service;
 	}
 	
-	public static void addResearchProject(String[] itemArray) {
-		getService().addResearchProject(itemArray);
-	}
 }

@@ -240,7 +240,7 @@
 					</entry>
 					<entry>
 						<key><value>type</value></key>
-						<value>text</value>
+						<value>file</value>
 					</entry>
 					<entry>
 						<key><value>super.setter</value></key>

@@ -190,7 +190,7 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 		node.setStatus(Constants.WorkPlanNode_STATUS_UNPUBLISH);
 		//build attachment
 		Attachment attach = new Attachment();
-		attach.setAttachmentId(Double.toString(Math.random()));
+		attach.setAttachmentId(((Long)values.get("attachmentId")).toString());
 		fillValues(attach, "super.setter", values);
 		node.setAttachment(attach);
 		//build workflow
@@ -229,6 +229,8 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 				typeClass = Date.class;
 			} else if("double".equals(type)) {
 				typeClass = double.class;
+			} else if("file".equals(type)) {
+				typeClass = String.class;
 			}
 			try {
 				Method method = targetClass.getMethod(methodName, typeClass);

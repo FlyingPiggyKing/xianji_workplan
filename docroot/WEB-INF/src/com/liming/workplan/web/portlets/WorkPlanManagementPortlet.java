@@ -1,7 +1,9 @@
 package com.liming.workplan.web.portlets;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,10 +14,22 @@ import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
 import javax.servlet.http.HttpServletResponse;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.service.ServiceContext;
+import com.liferay.portal.service.ServiceContextFactory;
+import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
+import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
+import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liming.workplan.service.BeanLocator;
 import com.liming.workplan.service.ResearchProjectService;
 import com.liming.workplan.utils.Constants;
@@ -37,8 +51,9 @@ public class WorkPlanManagementPortlet extends WorlplanBasePortlet {
 
 		if(Constants.WorlplanBasePortlet_RESOURCE_CMD_ADD.equals(cmd)) {
 			UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(resourceRequest);
-			String uploadcmd = uploadRequest.getParameter(Constants.WorlplanBasePortlet_RESOURCE_CMD);
-			addNodes(resourceRequest);
+			Map<String, Object> fileParams = uploadFileToUserFolder(
+					resourceRequest, uploadRequest);
+			addNodes(uploadRequest, fileParams);
 		} else if(Constants.WorlplanBasePortlet_RESOURCE_CMD_LOAD_PUBLISHED_NODES.equals(cmd)) {
 			getPublishedNodes(resourceRequest, resourceResponse);
 		} else if(Constants.WorlplanBasePortlet_RESOURCE_CMD_LOAD_UNPUBLISHED_NODES.equals(cmd)) {
@@ -56,10 +71,30 @@ public class WorkPlanManagementPortlet extends WorlplanBasePortlet {
 		}
 	}
 
-	protected void addNodes(ResourceRequest resourceRequest) {
-		String[] researchProjectItems = resourceRequest.getParameterValues("values");
+	
+
+
+
+	protected void addNodes(UploadPortletRequest uploadRequest, Map<String, Object> fileParams) {
+//		String[] researchProjectItems = resourceRequest.getParameterValues("values");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("type", ParamUtil.getString(uploadRequest, "type"));
+		params.put("projectType", ParamUtil.getString(uploadRequest, "projectType"));
+		params.put("projectName", ParamUtil.getString(uploadRequest, "projectName"));
+		params.put("supportUnit", ParamUtil.getString(uploadRequest, "supportUnit"));
+		params.put("projectLevel", ParamUtil.getString(uploadRequest, "projectLevel"));
+		params.put("charger", ParamUtil.getString(uploadRequest, "charger"));
+		params.put("assistant", ParamUtil.getString(uploadRequest, "assistant"));
+		params.put("projectFunding", ParamUtil.getDouble(uploadRequest, "projectFunding"));
+		params.put("delegatedDepartment", ParamUtil.getString(uploadRequest, "delegatedDepartment"));
+		params.put("typeDesc", ParamUtil.getString(uploadRequest, "typeDesc"));
+		params.put("attachmentName", fileParams.get("attachmentName"));
+		params.put("attachmentId", fileParams.get("attachmentId"));
+//		ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
+//		String fileDownloadUrl = themeDisplay.getPortalURL()+"/c/document_library/get_file?uuid="+fileEntry.getUuid()+"&groupId="+themeDisplay.getScopeGroupId();
+		params.put("attachmentURL", fileParams.get("attachmentURL"));
 		ResearchProjectService researchProjectService = BeanLocator.getResearchProjectService();
-		researchProjectService.addResearchProject(researchProjectItems);
+		researchProjectService.addResearchProject(params);
 	}
 	
 	protected void getPublishedNodes(ResourceRequest resourceRequest,
