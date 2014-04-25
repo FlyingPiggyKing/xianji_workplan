@@ -84,7 +84,7 @@ YUI.add("recordAdding", function(Y) {
 					}
 			};
 //        	rowWP.appendChild('<input type="hidden" name="resource_cmd" value="add" />');
-			Y.io(this.get('resourceURL') + "&resource_cmd=add", submitCfg);
+			Y.io(this.get('resourceURL') + "&resource_cmd=add&groupPermissions=VIEW", submitCfg);
         },
         
         _onSubmitSuccessed : function(id, res) {

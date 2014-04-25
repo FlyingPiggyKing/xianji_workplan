@@ -15,6 +15,7 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -76,6 +77,7 @@ public abstract class WorlplanBasePortlet extends MVCPortlet  {
 		try {
 			serviceContext = ServiceContextFactory.getInstance(
 					DLFolder.class.getName(), uploadRequest);
+//			serviceContext.setGroupPermissions(new String[]{ActionKeys.VIEW});
 			String targetFolderName = getTargetFolder();
 			long repositoryId = serviceContext.getScopeGroupId();
 			Folder targetFolder = null;
@@ -121,7 +123,7 @@ public abstract class WorlplanBasePortlet extends MVCPortlet  {
 		}
 		
 		ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
-		String fileDownloadUrl = themeDisplay.getPortalURL()+"/c/document_library/get_file?uuid="+fileEntry.getUuid()+"&groupId="+themeDisplay.getScopeGroupId();
+		String fileDownloadUrl = themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/c/document_library/get_file?uuid="+fileEntry.getUuid()+"&groupId="+themeDisplay.getScopeGroupId(); //themeDisplay.get.getPortalURL()+
 		Map<String, Object> fileParams = new HashMap<String, Object>();
 		fileParams.put("attachmentId", fileEntry.getFileEntryId());
 		fileParams.put("attachmentURL", fileDownloadUrl);
