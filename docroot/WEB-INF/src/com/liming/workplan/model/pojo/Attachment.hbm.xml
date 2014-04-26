@@ -9,9 +9,7 @@
   <property generated="never" lazy="false" name="attachmentName" type="string"/>
   <property generated="never" lazy="false" name="attachmentURL" type="string"/>
   <property generated="never" lazy="false" name="typeDesc" type="string"/>
-  <set inverse="true" name="node" sort="unsorted">
-   <key column="attachmentId"/>
-   <one-to-many class="com.liming.workplan.model.pojo.WorkPlanNode"/>
-  </set>
+  <many-to-one class="com.liming.workplan.model.pojo.WorkPlanNode"
+   column="nodeId" name="workplanNode" not-null="true"/>
  </class>
 </hibernate-mapping>

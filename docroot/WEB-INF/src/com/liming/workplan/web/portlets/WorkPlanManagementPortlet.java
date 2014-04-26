@@ -53,7 +53,7 @@ public class WorkPlanManagementPortlet extends WorlplanBasePortlet {
 			UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(resourceRequest);
 			Map<String, Object> fileParams = uploadFileToUserFolder(
 					resourceRequest, uploadRequest);
-			addNodes(uploadRequest, fileParams);
+//			addNodes(uploadRequest, fileParams);
 		} else if(Constants.WorlplanBasePortlet_RESOURCE_CMD_LOAD_PUBLISHED_NODES.equals(cmd)) {
 			getPublishedNodes(resourceRequest, resourceResponse);
 		} else if(Constants.WorlplanBasePortlet_RESOURCE_CMD_LOAD_UNPUBLISHED_NODES.equals(cmd)) {

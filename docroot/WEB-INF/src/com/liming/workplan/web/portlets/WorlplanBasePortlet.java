@@ -1,5 +1,6 @@
 package com.liming.workplan.web.portlets;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.upload.FileItem;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -29,6 +31,7 @@ import com.liming.workplan.utils.Constants;
 import com.liming.workplan.utils.UserThreadLocal;
 
 public abstract class WorlplanBasePortlet extends MVCPortlet  {
+	public static final String UPLOAD_FILE_PARAM = "attachment";
 	
 	@Override
 	public void serveResource(
@@ -94,25 +97,35 @@ public abstract class WorlplanBasePortlet extends MVCPortlet  {
 			
 			
 //				long folderId = ParamUtil.getLong(uploadRequest, "folderId");
-			String sourceFileName = uploadRequest.getFileName("attachmentName");
-			String title = ParamUtil.getString(uploadRequest, "title");
-			String contentType = uploadRequest.getContentType("attachmentName");
-			String desc = "";
-			InputStream inputStream = uploadRequest.getFileAsStream("attachmentName");
-			long size = uploadRequest.getSize("attachmentName");
-			String changeLog = ParamUtil.getString(
-					uploadRequest, "changeLog");
-			fileEntry = DLAppServiceUtil.addFileEntry(
-					repositoryId, targetFolder.getFolderId(), sourceFileName, contentType, sourceFileName,
-					desc, changeLog, inputStream, size, serviceContext);
-			try {
-				AssetPublisherUtil.addAndStoreSelection(
-						resourceRequest, DLFileEntry.class.getName(),
-						fileEntry.getFileEntryId(), -1);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+//			File[] uploadedFiles = uploadRequest.getFiles(UPLOAD_FILE_PARAM);
+			FileItem[] uploadedItems = uploadRequest.getMultipartParameterMap().get("attachment");//[0].getInputStream();
+			for(FileItem uploadedItem : uploadedItems) {
+//				String sourceFileName = uploadRequest.getFileName("attachmentName");
+				String sourceFileName = uploadedItem.getFileName();
+//				String title = ParamUtil.getString(uploadRequest, "title");
+//				String contentType = uploadRequest.getContentType("attachmentName");
+				String contentType = uploadedItem.getContentType();
+				String desc = "";
+//				InputStream inputStream = uploadRequest.getFileAsStream("attachmentName");
+				InputStream inputStream = uploadedItem.getInputStream();
+//				long size = uploadRequest.getSize("attachmentName");
+				long size = uploadedItem.getSize();
+				String changeLog = ParamUtil.getString(
+						uploadRequest, "changeLog");
+				fileEntry = DLAppServiceUtil.addFileEntry(
+						repositoryId, targetFolder.getFolderId(), sourceFileName, contentType, sourceFileName,
+						desc, changeLog, inputStream, size, serviceContext);
+				try {
+					AssetPublisherUtil.addAndStoreSelection(
+							resourceRequest, DLFileEntry.class.getName(),
+							fileEntry.getFileEntryId(), -1);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}
+
 //				DLAppServiceUtil.addFileEntry(repositoryId, folderId, sourceFileName, mimeType, title, description, changeLog, is, size, serviceContext)
 		} catch (PortalException e1) {
 			// TODO Auto-generated catch block

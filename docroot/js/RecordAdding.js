@@ -15,7 +15,10 @@ YUI.add("recordAdding", function(Y) {
 	RecordAdding.ROW_CONTAINER = '<div id=\'rowContainer\' class=\'yui3-g\'></div>';
 	RecordAdding.FORM_WRAPER = '<form enctype="multipart/form-data" method="POST"></form>';
 	RecordAdding.ADDING_BUTTON = '<button id=\'addingButton\' class="btn btn-primary">添加记录</button>';
+	RecordAdding.SELECT_INPUT = '<input type="file" name="attachment" />';
 	RecordAdding.SUBMIT_BUTTON = '<button id=\'submitButton\' class="btn btn-primary">提交</button>';
+	RecordAdding.ADD_FILE_BUTTON = '<div class="yui3-u"><button class="btn btn-primary addFile">添加文件</button></div>';
+	RecordAdding.FILE_INPUT_WRAPER = '<div class="uploadFileInput yui3-u-1-4" />';
 	RecordAdding.DIALOG_CONTAINER = '<div class="dialogContainer" />';
 	RecordAdding.EVENT_SUBMIT_COMPLETE = RecordAdding.NAME + ":submitComplete";
 	
@@ -23,6 +26,7 @@ YUI.add("recordAdding", function(Y) {
 		initializer : function(cfg) {
 			this.generator = new Y.WorkplanNodeGeneratorHelper({'rowConfJson' : cfg.rowConfJson, 'hasDefault':true});
 			this.rowCount = 0;
+//			this.formNumber = 1;
 	    },
 	    
 		renderUI : function() {
@@ -42,6 +46,8 @@ YUI.add("recordAdding", function(Y) {
         	addingButton.on('click', Y.bind(this._onAddClick, this));
         	var submitButton = contentBox.one('#submitButton');
         	submitButton.on('click', Y.bind(this._onSubmitClick, this));
+        	
+        	this.get("contentBox").delegate('click', Y.bind(this._onAddFileClick, this), '.addFile');
         },
         
         _onAddClick: function() {
@@ -50,9 +56,14 @@ YUI.add("recordAdding", function(Y) {
         	var rowWP = this.generator.buildRow(this.rowCount);
         	var formCon = Y.Node.create(RecordAdding.FORM_WRAPER);
         	formCon.append(rowWP);
+        	var addFileButton = Y.Node.create(RecordAdding.ADD_FILE_BUTTON);
+        	formCon.append(addFileButton);
+//        	formCon.setAttribute('id', this.formNumber);
+//        	this.formNumber += 1;
+        	
         	rowCon.appendChild(formCon);
         	
-        	this.rowCount += 1;
+//        	this.rowCount += 1;
         },
         
         _onSubmitClick: function() {
@@ -69,6 +80,16 @@ YUI.add("recordAdding", function(Y) {
         	this._submitValues(values);
 //        	rowCon.empty();
         	this.rowCount = 0;
+        },
+        
+        _onAddFileClick : function(e) {
+        	e.preventDefault();
+        	var target = e.target;
+        	var parentForm = target.ancestor('form');
+        	
+        	var uploadWraper = Y.Node.create(RecordAdding.FILE_INPUT_WRAPER);
+        	uploadWraper.append(Y.Node.create(RecordAdding.SELECT_INPUT));
+        	parentForm.append(uploadWraper);
         },
         
         _submitValues: function(values) {

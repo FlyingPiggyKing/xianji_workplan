@@ -13,12 +13,13 @@
   <property generated="never" lazy="false" name="author" type="long"/>
   <property generated="never" lazy="false" name="createDate" type="date"/>
   <property generated="never" lazy="false" name="status" type="string"/>
-  <many-to-one cascade="all"
-   class="com.liming.workplan.model.pojo.Attachment"
-   column="attachmentId" name="attachment" not-null="true"/>
   <many-to-one cascade="save-update"
    class="com.liming.workplan.model.pojo.WorkflowNode"
    column="workflowNodeId" name="workflowNode" not-null="true" unique="true"/>
+  <set inverse="true" name="attachment" sort="unsorted">
+   <key column="nodeId"/>
+   <one-to-many class="com.liming.workplan.model.pojo.Attachment"/>
+  </set>
   <joined-subclass name="com.liming.workplan.model.pojo.ResearchProject" table="RESEARCH_PROJECT">
    <key column="Research_Porject_ID"/>
    <property generated="never" lazy="false" name="type" type="string"/>
@@ -34,14 +35,14 @@
   <joined-subclass
    name="com.liming.workplan.model.pojo.ResearchAchievement" table="RESEARCH_ACHIEVEMENT">
    <key column="Research_Achievement_ID"/>
-   <property name="type" type="string"/>
-   <property name="subType" type="string"/>
-   <property name="achievementName" type="string"/>
-   <property name="achievementAuthor" type="string"/>
-   <property name="publishChannel" type="string"/>
-   <property name="publishDetail" type="string"/>
-   <property name="language" type="string"/>
-   <property name="remark" type="string"/>
+   <property generated="never" lazy="false" name="type" type="string"/>
+   <property generated="never" lazy="false" name="subType" type="string"/>
+   <property generated="never" lazy="false" name="achievementName" type="string"/>
+   <property generated="never" lazy="false" name="achievementAuthor" type="string"/>
+   <property generated="never" lazy="false" name="publishChannel" type="string"/>
+   <property generated="never" lazy="false" name="publishDetail" type="string"/>
+   <property generated="never" lazy="false" name="language" type="string"/>
+   <property generated="never" lazy="false" name="remark" type="string"/>
   </joined-subclass>
  </class>
 </hibernate-mapping>
