@@ -233,34 +233,6 @@
 						<value>setTypeDesc</value>
 					</entry>
 				</map>
-				<map>
-					<entry>
-						<key><value>field</value></key>
-						<value>attachmentName</value>
-					</entry>
-					<entry>
-						<key><value>type</value></key>
-						<value>file</value>
-					</entry>
-					<entry>
-						<key><value>super.setter</value></key>
-						<value>setAttachmentName</value>
-					</entry>
-				</map>
-				<map>
-					<entry>
-						<key><value>field</value></key>
-						<value>attachmentURL</value>
-					</entry>
-					<entry>
-						<key><value>type</value></key>
-						<value>text</value>
-					</entry>
-					<entry>
-						<key><value>super.setter</value></key>
-						<value>setAttachmentURL</value>
-					</entry>
-				</map>
 			</list>
 		</property>
 		<property name="researchProjectDao"  ref="ResearchProjectDao" />

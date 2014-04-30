@@ -1,6 +1,10 @@
 .tableContainer {
 	overflow-x: auto;
 }
+/** every file link in the table should be one line, here we set 150px to the div container **/
+.fileLink {
+	width: 150px;
+}
 /** BASE TABLE HEADER SORTING **/
 .sortArrow {
 	background: url("../images/sort-arrow-sprite.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0);

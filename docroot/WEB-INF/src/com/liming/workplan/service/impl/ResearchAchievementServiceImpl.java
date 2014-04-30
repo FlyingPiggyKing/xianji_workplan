@@ -10,6 +10,7 @@ import com.liferay.portal.model.User;
 import com.liming.workplan.dao.ExportDao;
 import com.liming.workplan.dao.ResearchAchievementDao;
 import com.liming.workplan.model.pojo.ResearchAchievement;
+import com.liming.workplan.model.pojo.WorkPlanNode;
 import com.liming.workplan.service.ResearchAchievementService;
 import com.liming.workplan.utils.Constants;
 import com.liming.workplan.utils.UserThreadLocal;
@@ -43,16 +44,16 @@ public class ResearchAchievementServiceImpl extends WorkPlanNodeBaseServiceImpl
 	private ResearchAchievementDao researchAchievementDao;	
 
 	@Override
-	public void addResearchAchievement(String[] itemArray) {
-		for(String item : itemArray) {
-			String[] values = item.split(Constants.VALUE_SEP);//
-			Map<String, Object> valueObject = convertStringToObj(values);
-			ResearchAchievement researchAchievement = researchAchievementDao.create();
-			initWorkPlanNode(researchAchievement, valueObject);
-			fillValues(researchAchievement, "setter", valueObject);
-			
-			researchAchievementDao.persist(researchAchievement);
-		}
+	public void addResearchAchievement(Map<String, Object> paramMap, List<Map<String, Object>> fileParams) {
+//		for(String item : itemArray) {
+//			String[] values = item.split(Constants.VALUE_SEP);//
+//			Map<String, Object> valueObject = convertStringToObj(values);
+//			ResearchAchievement researchAchievement = researchAchievementDao.create();
+//			initWorkPlanNode(researchAchievement, valueObject);
+//			fillValues(researchAchievement, "setter", valueObject);
+//			
+//			researchAchievementDao.persist(researchAchievement);
+//		}
 	}
 	
 	
@@ -149,11 +150,11 @@ public class ResearchAchievementServiceImpl extends WorkPlanNodeBaseServiceImpl
 	/* 
 	 * used for export the download value.
 	 */
-	public Object[] convertPojoToObject(Object[] pojos) {
+	public Object[] convertPojoToObject(Object pojos) {
 		Object[] objectValues = new Object[12];
 		int index = 0;
 		
-		ResearchAchievement researchAchievement = (ResearchAchievement)pojos[0];
+		ResearchAchievement researchAchievement = (ResearchAchievement)pojos;
 		objectValues[index++] = researchAchievement.getNodeId();
 		objectValues[index++] = researchAchievement.getType();
 		objectValues[index++] = researchAchievement.getSubType();

@@ -24,7 +24,7 @@ import com.liming.workplan.utils.UserThreadLocal;
 
 public class ResearchAchievementPortlet extends WorlplanBasePortlet {
 
-	protected void addNodes(UploadPortletRequest uploadRequest, Map<String, Object> fileParams) {
+	protected void addNodes(UploadPortletRequest uploadRequest, List<Map<String, Object>> fileParams) {
 //		String[] researchAchievementItems = resourceRequest.getParameterValues("values");
 //		ResearchAchievementService researchAchievementService = BeanLocator.getResearchAchievementService();
 //		researchAchievementService.addResearchAchievement(researchAchievementItems);

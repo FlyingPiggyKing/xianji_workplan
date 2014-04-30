@@ -51,9 +51,9 @@ public class WorkPlanManagementPortlet extends WorlplanBasePortlet {
 
 		if(Constants.WorlplanBasePortlet_RESOURCE_CMD_ADD.equals(cmd)) {
 			UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(resourceRequest);
-			Map<String, Object> fileParams = uploadFileToUserFolder(
+			List<Map<String, Object>> fileParams = uploadFileToUserFolder(
 					resourceRequest, uploadRequest);
-//			addNodes(uploadRequest, fileParams);
+			addNodes(uploadRequest, fileParams);
 		} else if(Constants.WorlplanBasePortlet_RESOURCE_CMD_LOAD_PUBLISHED_NODES.equals(cmd)) {
 			getPublishedNodes(resourceRequest, resourceResponse);
 		} else if(Constants.WorlplanBasePortlet_RESOURCE_CMD_LOAD_UNPUBLISHED_NODES.equals(cmd)) {
@@ -75,7 +75,7 @@ public class WorkPlanManagementPortlet extends WorlplanBasePortlet {
 
 
 
-	protected void addNodes(UploadPortletRequest uploadRequest, Map<String, Object> fileParams) {
+	protected void addNodes(UploadPortletRequest uploadRequest, List<Map<String, Object>> fileParams) {
 //		String[] researchProjectItems = resourceRequest.getParameterValues("values");
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("type", ParamUtil.getString(uploadRequest, "type"));
@@ -87,14 +87,14 @@ public class WorkPlanManagementPortlet extends WorlplanBasePortlet {
 		params.put("assistant", ParamUtil.getString(uploadRequest, "assistant"));
 		params.put("projectFunding", ParamUtil.getDouble(uploadRequest, "projectFunding"));
 		params.put("delegatedDepartment", ParamUtil.getString(uploadRequest, "delegatedDepartment"));
-		params.put("typeDesc", ParamUtil.getString(uploadRequest, "typeDesc"));
-		params.put("attachmentName", fileParams.get("attachmentName"));
-		params.put("attachmentId", fileParams.get("attachmentId"));
+//		params.put("typeDesc", ParamUtil.getString(uploadRequest, "typeDesc"));
+//		params.put("attachmentName", fileParams.get("attachmentName"));
+//		params.put("attachmentId", fileParams.get("attachmentId"));
 //		ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
 //		String fileDownloadUrl = themeDisplay.getPortalURL()+"/c/document_library/get_file?uuid="+fileEntry.getUuid()+"&groupId="+themeDisplay.getScopeGroupId();
-		params.put("attachmentURL", fileParams.get("attachmentURL"));
+//		params.put("attachmentURL", fileParams.get("attachmentURL"));
 		ResearchProjectService researchProjectService = BeanLocator.getResearchProjectService();
-		researchProjectService.addResearchProject(params);
+		researchProjectService.addResearchProject(params, fileParams);
 	}
 	
 	protected void getPublishedNodes(ResourceRequest resourceRequest,

@@ -16,7 +16,7 @@
   <many-to-one cascade="save-update"
    class="com.liming.workplan.model.pojo.WorkflowNode"
    column="workflowNodeId" name="workflowNode" not-null="true" unique="true"/>
-  <set inverse="true" name="attachment" sort="unsorted">
+  <set cascade="all" inverse="true" name="attachment" sort="unsorted">
    <key column="nodeId"/>
    <one-to-many class="com.liming.workplan.model.pojo.Attachment"/>
   </set>

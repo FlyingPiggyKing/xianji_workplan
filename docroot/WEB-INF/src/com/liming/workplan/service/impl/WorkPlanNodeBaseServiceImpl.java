@@ -8,9 +8,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import jxl.Workbook;
 import jxl.WorkbookSettings;
@@ -51,13 +54,13 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 	private WorkflowService workflowService;
 	private LanguageService languageService;
 	private static WritableCellFormat WFC_FONT;
-	
+	private static final String COMMER = ",";
+	private static final String SEPATOR = "~-~";
 	
 	private enum TableColumn {
-//		NODEID("nodeId"),
-		ATTACHMENT_NAME("attachmentName"), 
-		ATTACHMENT_URL("attachmentURL"),
-		TYPE_DESE("typeDesc");
+		ATTACHMENT_NAME(Constants.Attachment_NAME), 
+		ATTACHMENT_URL(Constants.Attachment_URL),
+		TYPE_DESE(Constants.Attachment_DESC);
 		
 		private final String value;
         private TableColumn(String value) {
@@ -84,27 +87,54 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 		return workflowService;
 	}
 	
-	public Object[] convertPojoToObject(Object[] pojos) {
+	/*
+	 * Used for download result data converting.
+	 */
+	public Object[] convertPojoToObject(Object workplanNode) {
 		Object[] objectValues = new Object[2];
 		int index = 0;
-		if(pojos.length == 1) {
-			ResearchProject researchProject = (ResearchProject)pojos[0];
-			objectValues[index++] = researchProject.getAttachment().getTypeDesc();
-			objectValues[index++] = researchProject.getAttachment().getAttachmentName();
-		} else {
-			Attachment attachment = (Attachment)pojos[1];
 
-			objectValues[index++] = attachment.getTypeDesc();
-			objectValues[index++] = attachment.getAttachmentName();
+		List<Attachment> attachs = (List<Attachment>)((WorkPlanNode)workplanNode).getAttachment();
+		StringBuilder desc = new StringBuilder();
+		StringBuilder name = new StringBuilder();
+		for(int attachIndex = 0; attachIndex < attachs.size(); attachIndex++) {
+			desc.append(attachs.get(attachIndex).getTypeDesc());
+			name.append(attachs.get(attachIndex).getAttachmentName());
+			if(attachIndex != attachs.size() - 1) {
+				desc.append(COMMER);
+				name.append(COMMER);
+			}
 		}
+		objectValues[index++] = desc.toString();
+		objectValues[index++] = name.toString();
 		return objectValues;
 	}
 	
+	/*
+	 * Used for convert pojo to datalist, in order to display in the table of html page.
+	 */
 	public void fillDisplayTable(WorkPlanNode node, Map<String, String> row) {		
 //		row.put(TableColumn.NODEID.value(), Integer.toString(node.getNodeId()));
-		row.put(TableColumn.ATTACHMENT_NAME.value(), node.getAttachment().getAttachmentName());
-		row.put(TableColumn.ATTACHMENT_URL.value(), node.getAttachment().getAttachmentURL());
-		row.put(TableColumn.TYPE_DESE.value(), node.getAttachment().getTypeDesc());
+		Set<Attachment> attachs = (Set<Attachment>)node.getAttachment();
+		StringBuilder desc = new StringBuilder();
+		StringBuilder name = new StringBuilder();
+		StringBuilder url = new StringBuilder();
+
+		Iterator<Attachment> iter = attachs.iterator();
+		while(iter.hasNext()) {
+			Attachment attach = iter.next();
+			desc.append(attach.getTypeDesc());
+			name.append(attach.getAttachmentName());
+			url.append(attach.getAttachmentURL());
+			if(iter.hasNext()) {
+				desc.append(SEPATOR);
+				name.append(SEPATOR);
+				url.append(SEPATOR);
+			}
+		}
+		row.put(TableColumn.ATTACHMENT_NAME.value(), name.toString());
+		row.put(TableColumn.ATTACHMENT_URL.value(), url.toString());
+		row.put(TableColumn.TYPE_DESE.value(), desc.toString());
 	}
 	
 	public List<String[]> getPublishedTableHeader() {
@@ -182,17 +212,27 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 		return valueMap;
 	}
 
-	protected void initWorkPlanNode(WorkPlanNode node, Map<String, Object> values) {
+	protected void initWorkPlanNode(WorkPlanNode node, List<Map<String, Object>> values) {
 		User currentUser = UserThreadLocal.getCurrentUser();
 		Date currentDate = DateUtil.newDate();
 		node.setAuthor(currentUser.getUserId());
 		node.setCreateDate(currentDate);
 		node.setStatus(Constants.WorkPlanNode_STATUS_UNPUBLISH);
 		//build attachment
-		Attachment attach = new Attachment();
-		attach.setAttachmentId(((Long)values.get("attachmentId")).toString());
-		fillValues(attach, "super.setter", values);
-		node.setAttachment(attach);
+		Set<Attachment> sets = new HashSet<Attachment>();
+		for(Map<String, Object> valueItem : values) {
+			Attachment attach = new Attachment();
+			attach.setAttachmentId(((Long)valueItem.get(Constants.Attachment_ID)).toString());
+			attach.setAttachmentName(valueItem.get(Constants.Attachment_NAME).toString());
+			attach.setAttachmentURL(valueItem.get(Constants.Attachment_URL).toString());
+			attach.setTypeDesc(valueItem.get(Constants.Attachment_DESC).toString());
+			attach.setWorkplanNode(node);
+			fillValues(attach, "super.setter", valueItem);
+			sets.add(attach);
+			
+		}
+		
+		node.setAttachment(sets);
 		//build workflow
 		log.debug("build workflow");
 		WorkflowNode workflow = new WorkflowNode();
@@ -329,12 +369,12 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 			ScrollableResults scrollResult = exportDao.getPublishedResearchPorjectsScroll(type, searchOb);
 
 			while(resultIndex != -1 && resultIndex <= 65500) {// && resultIndex <= 5000 <-- remove the download limition, this is requested by business.
-				List<Object[]> batchResult = new ArrayList<Object[]>();
+				List<Object> batchResult = new ArrayList<Object>();
 
 				resultIndex = exportDao.getBatchResultByScrolling(scrollResult, resultIndex, batchResult);
 				log.debug("download report number: " + resultIndex);
 				List<List<String>> batchOutput = new ArrayList<List<String>>();
-				for(Object[] row : batchResult) {
+				for(Object row : batchResult) {
 					batchOutput.add(DataConvertTool.convertObjectsToString(convertPojoToObject(row)));
 				}
 //				refineResult(outputs, batchOutput);

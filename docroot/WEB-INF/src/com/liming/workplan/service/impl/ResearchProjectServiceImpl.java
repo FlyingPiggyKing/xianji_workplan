@@ -55,12 +55,12 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 	private ResearchProjectDao researchProjectDao;	
 
 	@Override
-	public void addResearchProject(Map<String, Object> paramMap) {
+	public void addResearchProject(Map<String, Object> paramMap, List<Map<String, Object>> fileParams) {
 //		for(String item : itemArray) {
 //			String[] values = item.split(Constants.VALUE_SEP);//
 //			Map<String, Object> valueObject = convertStringToObj(values);
 			ResearchProject researchProject = researchProjectDao.create();
-			initWorkPlanNode(researchProject, paramMap);
+			initWorkPlanNode(researchProject, fileParams);
 			fillValues(researchProject, "setter", paramMap);
 			
 			researchProjectDao.persist(researchProject);
@@ -179,11 +179,11 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 	/* 
 	 * used for export the download value.
 	 */
-	public Object[] convertPojoToObject(Object[] pojos) {
+	public Object[] convertPojoToObject(Object pojos) {
 		Object[] objectValues = new Object[12];
 		int index = 0;
 		
-		ResearchProject researchProject = (ResearchProject)pojos[0];
+		ResearchProject researchProject = (ResearchProject)pojos;
 		objectValues[index++] = researchProject.getNodeId();
 		objectValues[index++] = researchProject.getType();
 		objectValues[index++] = researchProject.getProjectType();

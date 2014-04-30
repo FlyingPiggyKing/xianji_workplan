@@ -9,6 +9,7 @@ YUI.add("myWorkplanTableWidget", function(Y) {
 	MyWorkplanNodeTable.CHECKBOX_CHECKED = '<input type="checkbox" class="rowSelect" checked />';
 	MyWorkplanNodeTable.BUTTON_DELETE = '<button id="deleteButton">删除</button>';
 	MyWorkplanNodeTable.DIALOG_CONTAINER = '<div class="dialogContainer" />';
+	MyWorkplanNodeTable.FILE_ITEM_WRAPPER = '<div class="fileLink" />';
 	
 	Y.MyWorkplanNodeTable = Y.extend(MyWorkplanNodeTable, Y.BaseTableWidget, {
 	    
@@ -18,6 +19,26 @@ YUI.add("myWorkplanTableWidget", function(Y) {
 					allowHTML: true,	
 					nodeFormatter: this._nodeFormatter,
 					label:' '
+			}
+			for(var headerIndex = 0; headerIndex < header.length; headerIndex++) {
+				//format url header.
+				//every url should be one line.
+				if(header[headerIndex].key == "typeDesc") {
+					header[headerIndex] = {
+						key: 'typeDesc',
+						allowHTML: true,
+						label:header[headerIndex].label,
+						nodeFormatter: this._FileDescFormatter	
+					}
+					
+				} else if(header[headerIndex].key == "attachmentName") {
+					header[headerIndex] = {
+						key: 'attachmentName',
+						allowHTML: true,
+						label:header[headerIndex].label,
+						nodeFormatter: this._FileLinkFormatter	
+					}
+				}
 			}
 			header.splice(0, 0, checkColumn);
 			header = this._setBaseTableColumnsTemplate(header);
@@ -36,6 +57,35 @@ YUI.add("myWorkplanTableWidget", function(Y) {
 	    	} else {
 	    		o.cell.set('text', '');
 	    	}
+	    	return false;
+	    },
+	    
+	    _FileDescFormatter : function(o) {
+	    	var values = o.data.typeDesc;
+	    	values = values.split("~-~");
+	    	var index = 1;
+	    	Y.each(values, function(value){
+	    		var wrapper = Y.Node.create(MyWorkplanNodeTable.FILE_ITEM_WRAPPER);
+	    		wrapper.setHTML(index++ + "." + value);
+	    		o.cell.append(wrapper);
+	    	});
+	    	return false;
+	    },
+	    
+	    _FileLinkFormatter : function(o) {
+	    	var values = o.data.attachmentName;
+	    	values = values.split("~-~");
+	    	var urls = o.data.attachmentURL;
+	    	urls = urls.split("~-~");
+	    	
+	    	for(var index = 0; index < values.length; index++) {
+	    		var wrapper = Y.Node.create(MyWorkplanNodeTable.FILE_ITEM_WRAPPER);
+	    		var link = Y.Node.create('<a>' + (index + 1) + '.' + values[index] + '</a>');
+	    		link.setAttribute('href', urls[index]);
+	    		wrapper.setHTML(link);
+	    		o.cell.append(wrapper);
+	    	}
+	    		
 	    	return false;
 	    },
 	    

@@ -15,11 +15,12 @@ YUI.add("recordAdding", function(Y) {
 	RecordAdding.ROW_CONTAINER = '<div id=\'rowContainer\' class=\'yui3-g\'></div>';
 	RecordAdding.FORM_WRAPER = '<form enctype="multipart/form-data" method="POST"></form>';
 	RecordAdding.ADDING_BUTTON = '<button id=\'addingButton\' class="btn btn-primary">添加记录</button>';
-	RecordAdding.SELECT_INPUT = '<input type="file" name="attachment" />';
+	RecordAdding.SELECT_INPUT = '<input type="file" />';
 	RecordAdding.SUBMIT_BUTTON = '<button id=\'submitButton\' class="btn btn-primary">提交</button>';
-	RecordAdding.ADD_FILE_BUTTON = '<div class="yui3-u"><button class="btn btn-primary addFile">添加文件</button></div>';
+	RecordAdding.ADD_FILE_BUTTON = '<div class="yui3-u-1"><button class="btn btn-primary addFile">添加文件</button></div>';
 	RecordAdding.FILE_INPUT_WRAPER = '<div class="uploadFileInput yui3-u-1-4" />';
 	RecordAdding.DIALOG_CONTAINER = '<div class="dialogContainer" />';
+	RecordAdding.SUBMIT_RESPONSE_CONTAINER = '<div class="responseContainer" />';
 	RecordAdding.EVENT_SUBMIT_COMPLETE = RecordAdding.NAME + ":submitComplete";
 	
 	Y.RecordAdding = Y.extend(RecordAdding, Y.Widget, {
@@ -54,6 +55,11 @@ YUI.add("recordAdding", function(Y) {
         	var contentBox = this.get('contentBox');
         	var rowCon = contentBox.one('#rowContainer');
         	var rowWP = this.generator.buildRow(this.rowCount);
+        	var fileTypeSelector = rowWP.one('select[name="typeDesc"]').ancestor('div');
+        	rowWP.removeChild(fileTypeSelector);
+        	if(this.fileTypeSelector == null) {
+        		this.fileTypeSelector = fileTypeSelector;
+        	}
         	var formCon = Y.Node.create(RecordAdding.FORM_WRAPER);
         	formCon.append(rowWP);
         	var addFileButton = Y.Node.create(RecordAdding.ADD_FILE_BUTTON);
@@ -88,24 +94,34 @@ YUI.add("recordAdding", function(Y) {
         	var parentForm = target.ancestor('form');
         	
         	var uploadWraper = Y.Node.create(RecordAdding.FILE_INPUT_WRAPER);
-        	uploadWraper.append(Y.Node.create(RecordAdding.SELECT_INPUT));
+        	var selector = this.fileTypeSelector.cloneNode(true);
+        	var time = new Date().valueOf();
+        	selector.one('select').setAttribute('name', 'attachment' + time);
+        	uploadWraper.append(selector);
+        	var fileInput = Y.Node.create(RecordAdding.SELECT_INPUT);
+        	fileInput.setAttribute('name', 'attachmentFile' + time);
+        	uploadWraper.append(fileInput);
         	parentForm.append(uploadWraper);
         },
         
         _submitValues: function(values) {
 //        	var postParams = {'values': values, 'resource_cmd':'add'};
-        	var submitCfg = {
-					method: 'POST',
-					form: {
-			            id: values[0],
-			            upload: true
-			        },
-					on: {
-						complete: Y.bind(this._onSubmitSuccessed, this)
-					}
-			};
-//        	rowWP.appendChild('<input type="hidden" name="resource_cmd" value="add" />');
-			Y.io(this.get('resourceURL') + "&resource_cmd=add&groupPermissions=VIEW", submitCfg);
+        	Y.each(values, Y.bind(function(form, key){
+        		var submitCfg = {
+    					method: 'POST',
+    					form: {
+    			            id: form,
+    			            upload: true
+    			        },
+    					on: {
+    						complete: Y.bind(this._onSubmitSuccessed, this)
+    					}
+    			};
+//            	rowWP.appendChild('<input type="hidden" name="resource_cmd" value="add" />');
+//    			Y.io(this.get('resourceURL') + "&resource_cmd=add&groupPermissions=VIEW", submitCfg);
+    			Y.io.queue(this.get('resourceURL') + "&resource_cmd=add&groupPermissions=VIEW", submitCfg);
+        	}, this));
+        	Y.io.queue.start();
         },
         
         _onSubmitSuccessed : function(id, res) {
@@ -134,10 +150,14 @@ YUI.add("recordAdding", function(Y) {
 			        e.preventDefault();
 			        this.callbackPanel.hide();
 			        Y.fire(RecordAdding.EVENT_SUBMIT_COMPLETE, {'status' : 'success'});
+			        this.callbackPanel.get('srcNode').empty();
 			    }, this);
 				this.callbackPanel.render();
 			}
-			
+			var contentDiv = this.callbackPanel.get('srcNode');
+			var responseCon = Y.Node.create(RecordAdding.SUBMIT_RESPONSE_CONTAINER);
+			responseCon.setHTML(id + " submit successfully.");
+			contentDiv.one('.yui3-widget-bd').append(responseCon);
 			this.callbackPanel.show();
 			
 		},

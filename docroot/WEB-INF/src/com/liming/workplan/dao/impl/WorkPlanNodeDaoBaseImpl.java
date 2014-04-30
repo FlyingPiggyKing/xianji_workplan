@@ -168,10 +168,10 @@ public abstract class WorkPlanNodeDaoBaseImpl {
 		return scrollResult;
 	}
 	
-	public int getBatchResultByScrolling(ScrollableResults scrollResult, Integer beginIndex, List<Object[]> batchResult) {
+	public int getBatchResultByScrolling(ScrollableResults scrollResult, Integer beginIndex, List<Object> batchResult) {
 		while(scrollResult.next()) {
 			
-			Object[] row = (Object[])scrollResult.get();
+			Object row = scrollResult.get();
 			batchResult.add(row);
 			beginIndex++;
 			if(beginIndex % 100 == 0) {

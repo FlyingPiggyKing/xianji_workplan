@@ -7,7 +7,7 @@ import java.util.Map;
 import com.liming.workplan.model.pojo.ResearchAchievement;
 
 public interface ResearchAchievementService {
-	public void addResearchAchievement(String[] itemArray);
+	public void addResearchAchievement(Map<String, Object> paramMap, List<Map<String, Object>> fileParams);
 	public List<Map<String, Object>> getRowConfiguration();
 	public List<Map<String, Object>> getSearchConfiguration();
 	public List<Map<String, String>> loadPublishedResearchAchievement(String[] searchParams, int pageNumber, int pageSize, String sortColumn, String order);

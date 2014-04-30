@@ -40,4 +40,9 @@ public interface Constants {
 	public static final String WorkflowNode_NODE_STATUS_COMPLETED = "completed";
 	
 	public static final String BK = " ";
+	
+	public static final String Attachment_ID = "attachmentId";
+	public static final String Attachment_DESC = "typeDesc";
+	public static final String Attachment_NAME = "attachmentName";
+	public static final String Attachment_URL = "attachmentURL";
 }
