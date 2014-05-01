@@ -4,6 +4,7 @@
 /** every file link in the table should be one line, here we set 150px to the div container **/
 .fileLink {
 	width: 150px;
+	overflow-x: auto;
 }
 /** BASE TABLE HEADER SORTING **/
 .sortArrow {

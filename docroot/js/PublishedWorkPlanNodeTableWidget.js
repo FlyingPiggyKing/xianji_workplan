@@ -14,7 +14,7 @@ YUI.add("workplanTableWidget", function(Y) {
 	
 	Y.WorkplanNodeTable = Y.extend(WorkplanNodeTable, Y.BaseTableWidget, {
 	    initializer: function(cfg) {
-	    	this.generator = new Y.WorkplanNodeGeneratorHelper({'rowConfJson' : cfg.rowConfJson, 'hasDefault': false});
+	    	this.domHelper = new Y.WorkplanNodeDomHelper({'rowConfJson' : cfg.rowConfJson, 'hasDefault': false});
 	    	this.needStatistics = cfg.needStatistics;
 	    },
 	    
@@ -22,7 +22,7 @@ YUI.add("workplanTableWidget", function(Y) {
 	    	var contentBox =  this.get('contentBox');
 	    	var rowContainer = Y.Node.create(WorkplanNodeTable.ROW_CONTAINER);
 			contentBox.appendChild(rowContainer);
-	    	var rowWP = this.generator.buildRow();
+	    	var rowWP = this.domHelper.buildRow();
 	    	rowContainer.appendChild(rowWP);
 	    	//add search button
 	    	this.searchButton = this._appendButton(WorkplanNodeTable.BUTTON_SEARCH);
@@ -60,30 +60,50 @@ YUI.add("workplanTableWidget", function(Y) {
 	    	var contentBox = this.get('contentBox');
 	    	var searchContainer = contentBox.one('#rowContainer');
 	    	var row = searchContainer.one('.rowWrapper');
-	    	this.rowValue = this.generator.getRowValue(row);
+	    	this.rowValue = this.domHelper.getRowValue(row);
 	    	
 	    	this.get('data').load({'pageNumber':1});
 	    	this._getTotalPageNumber();
 	    },
 	    
 		setTableColumns : function(header) {
+//			for(var headerIndex = 0; headerIndex < header.length; headerIndex++) {
+//				if(header[headerIndex].key == "attachmentName") {
+//					header[headerIndex].allowHTML = true;
+//					header[headerIndex].nodeFormatter = this._nodeFormatter;
+//					break;
+//				}
+//				
+//			}
 			for(var headerIndex = 0; headerIndex < header.length; headerIndex++) {
-				if(header[headerIndex].key == "attachmentName") {
-					header[headerIndex].allowHTML = true;
-					header[headerIndex].nodeFormatter = this._nodeFormatter;
-					break;
+				//format url header.
+				//every url should be one line.
+				if(header[headerIndex].key == "typeDesc") {
+					header[headerIndex] = {
+						key: 'typeDesc',
+						allowHTML: true,
+						label:header[headerIndex].label,
+						nodeFormatter: this.domHelper.formatFileDesc	
+					}
+					
+				} else if(header[headerIndex].key == "attachmentName") {
+					header[headerIndex] = {
+						key: 'attachmentName',
+						allowHTML: true,
+						label:header[headerIndex].label,
+						nodeFormatter: this.domHelper.formatFileLink	
+					}
 				}
 			}
-			
 			header = this._setBaseTableColumnsTemplate(header);
 	    	this.get('table').set('columns', header);
 	    },
 	    
-	    _nodeFormatter : function(o) {
-	    	var content = Y.Node.create('<a href="' + o.data.attachmentURL + '">' + o.data.attachmentName + '</a>');
-	    	o.cell.append(content);
-	    	return false;
-	    },
+//	    _nodeFormatter : function(o) {
+//	    	var content = Y.Node.create('<a href="' + o.data.attachmentURL + '">' + o.data.attachmentName + '</a>');
+//	    	o.cell.append(content);
+//	    	return false;
+//	    },
 	    
 	    _generateLoadData: function(options) {
 	    	var params = this.constructor.superclass._generateLoadData.call(this,options);
@@ -147,4 +167,4 @@ YUI.add("workplanTableWidget", function(Y) {
 		}
 	});
 	
-}, '0.0.1', {requires:["event", "widget", "io", "model-list", "baseTableWidget", "json-parse"]});
+}, '0.0.1', {requires:["event", "domHelper", "widget", "io", "model-list", "baseTableWidget", "json-parse"]});

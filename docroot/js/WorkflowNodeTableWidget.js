@@ -28,8 +28,32 @@ YUI.add("workflowTableWidget", function(Y) {
 	};
 	
 	Y.WorkflowNodeTable = Y.extend(WorkflowNodeTable, Y.BaseTableWidget, {
+		
+		initializer: function(cfg) {
+	    	this.domHelper = new Y.WorkplanNodeDomHelper({});
+	    },
 	    
 		setTableColumns : function(header) {
+			for(var headerIndex = 0; headerIndex < header.length; headerIndex++) {
+				//format url header.
+				//every url should be one line.
+				if(header[headerIndex].key == "typeDesc") {
+					header[headerIndex] = {
+						key: 'typeDesc',
+						allowHTML: true,
+						label:header[headerIndex].label,
+						nodeFormatter: this.domHelper.formatFileDesc	
+					}
+					
+				} else if(header[headerIndex].key == "attachmentName") {
+					header[headerIndex] = {
+						key: 'attachmentName',
+						allowHTML: true,
+						label:header[headerIndex].label,
+						nodeFormatter: this.domHelper.formatFileLink	
+					}
+				}
+			}
 			var checkColumn = {
 					key: WorkflowNodeTable.CHECK_COLUMN,
 					allowHTML: true,
@@ -205,4 +229,4 @@ YUI.add("workflowTableWidget", function(Y) {
 	    }
 	});
 	
-}, '0.0.1', {requires:["event", "widget", "panel", "io", "model-list", "baseTableWidget", "json-parse"]});
+}, '0.0.1', {requires:["event", "domHelper", "widget", "panel", "io", "model-list", "baseTableWidget", "json-parse"]});

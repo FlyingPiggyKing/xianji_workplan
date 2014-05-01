@@ -9,17 +9,15 @@ YUI.add("myWorkplanTableWidget", function(Y) {
 	MyWorkplanNodeTable.CHECKBOX_CHECKED = '<input type="checkbox" class="rowSelect" checked />';
 	MyWorkplanNodeTable.BUTTON_DELETE = '<button id="deleteButton">删除</button>';
 	MyWorkplanNodeTable.DIALOG_CONTAINER = '<div class="dialogContainer" />';
-	MyWorkplanNodeTable.FILE_ITEM_WRAPPER = '<div class="fileLink" />';
 	
 	Y.MyWorkplanNodeTable = Y.extend(MyWorkplanNodeTable, Y.BaseTableWidget, {
+		
+		initializer : function(cfg) {
+			this.domHelper = new Y.WorkplanNodeDomHelper({});
+			this.rowCount = 0;
+	    },
 	    
 		setTableColumns : function(header) {
-			var checkColumn = {
-					key: 'checkbox',
-					allowHTML: true,	
-					nodeFormatter: this._nodeFormatter,
-					label:' '
-			}
 			for(var headerIndex = 0; headerIndex < header.length; headerIndex++) {
 				//format url header.
 				//every url should be one line.
@@ -28,7 +26,7 @@ YUI.add("myWorkplanTableWidget", function(Y) {
 						key: 'typeDesc',
 						allowHTML: true,
 						label:header[headerIndex].label,
-						nodeFormatter: this._FileDescFormatter	
+						nodeFormatter: this.domHelper.formatFileDesc	
 					}
 					
 				} else if(header[headerIndex].key == "attachmentName") {
@@ -36,9 +34,15 @@ YUI.add("myWorkplanTableWidget", function(Y) {
 						key: 'attachmentName',
 						allowHTML: true,
 						label:header[headerIndex].label,
-						nodeFormatter: this._FileLinkFormatter	
+						nodeFormatter: this.domHelper.formatFileLink	
 					}
 				}
+			}
+			var checkColumn = {
+					key: 'checkbox',
+					allowHTML: true,	
+					nodeFormatter: this._nodeFormatter,
+					label:' '
 			}
 			header.splice(0, 0, checkColumn);
 			header = this._setBaseTableColumnsTemplate(header);
@@ -60,34 +64,6 @@ YUI.add("myWorkplanTableWidget", function(Y) {
 	    	return false;
 	    },
 	    
-	    _FileDescFormatter : function(o) {
-	    	var values = o.data.typeDesc;
-	    	values = values.split("~-~");
-	    	var index = 1;
-	    	Y.each(values, function(value){
-	    		var wrapper = Y.Node.create(MyWorkplanNodeTable.FILE_ITEM_WRAPPER);
-	    		wrapper.setHTML(index++ + "." + value);
-	    		o.cell.append(wrapper);
-	    	});
-	    	return false;
-	    },
-	    
-	    _FileLinkFormatter : function(o) {
-	    	var values = o.data.attachmentName;
-	    	values = values.split("~-~");
-	    	var urls = o.data.attachmentURL;
-	    	urls = urls.split("~-~");
-	    	
-	    	for(var index = 0; index < values.length; index++) {
-	    		var wrapper = Y.Node.create(MyWorkplanNodeTable.FILE_ITEM_WRAPPER);
-	    		var link = Y.Node.create('<a>' + (index + 1) + '.' + values[index] + '</a>');
-	    		link.setAttribute('href', urls[index]);
-	    		wrapper.setHTML(link);
-	    		o.cell.append(wrapper);
-	    	}
-	    		
-	    	return false;
-	    },
 	    
 	    setData : function(data) {
 	    	for(var rowIndex = 0; rowIndex < data.length; rowIndex++) {
@@ -220,4 +196,4 @@ YUI.add("myWorkplanTableWidget", function(Y) {
 		
 	});
 	
-}, '0.0.1', {requires:["event", "widget", "panel", "io", "model-list", "baseTableWidget", "json-parse"]});
+}, '0.0.1', {requires:["event", "domHelper", "widget", "panel", "io", "model-list", "baseTableWidget", "json-parse"]});

@@ -1,23 +1,19 @@
 /**
  * 
  */
-YUI.add("nodeGenerator", function(Y) {
-	function WorkplanNodeGeneratorHelper(config) {
-		WorkplanNodeGeneratorHelper.superclass.constructor.apply(this, arguments);
+YUI.add("domHelper", function(Y) {
+	function WorkplanNodeDomHelper(config) {
+		WorkplanNodeDomHelper.superclass.constructor.apply(this, arguments);
 	}
 	
-	WorkplanNodeGeneratorHelper.NAME = "workplanNodeGeneratorHelper";
-	WorkplanNodeGeneratorHelper.CONNECTOR = "~-~";
+	WorkplanNodeDomHelper.NAME = "workplanNodeDomHelper";
+	WorkplanNodeDomHelper.CONNECTOR = "~-~";
+	WorkplanNodeDomHelper.ROW_WRAPPER_ODD = '<div class=\'rowWrapper yui3-g yui3-u\' style=\'background-color:#EDF5FF\'></div>';
+	WorkplanNodeDomHelper.ROW_WRAPPER_EVEN = '<div class=\'rowWrapper yui3-g yui3-u\'></div>';
+	WorkplanNodeDomHelper.CELL_WRAPPER = '<div class=\'cellWrapper yui3-u-1-4\'></div>';
+	WorkplanNodeDomHelper.FILE_ITEM_WRAPPER = '<div class="fileLink" />';
 	
-//	WorkplanNodeGeneratorHelper.ATTRS = {
-//		rowConfJson: {value:""}
-//	};
-	
-	WorkplanNodeGeneratorHelper.ROW_WRAPPER_ODD = '<div class=\'rowWrapper yui3-g yui3-u\' style=\'background-color:#EDF5FF\'></div>';
-	WorkplanNodeGeneratorHelper.ROW_WRAPPER_EVEN = '<div class=\'rowWrapper yui3-g yui3-u\'></div>';
-	WorkplanNodeGeneratorHelper.CELL_WRAPPER = '<div class=\'cellWrapper yui3-u-1-4\'></div>';
-	
-	Y.WorkplanNodeGeneratorHelper = Y.extend(WorkplanNodeGeneratorHelper, Y.Base, {
+	Y.WorkplanNodeDomHelper = Y.extend(WorkplanNodeDomHelper, Y.Base, {
 		
 		initializer : function(cfg) {
 			this.rowConfJson = cfg.rowConfJson;
@@ -27,14 +23,14 @@ YUI.add("nodeGenerator", function(Y) {
         buildRow: function(rowCount) {
         	var rowConfJson = Y.JSON.parse(this.rowConfJson).rowConfigJson;
 
-        	var rowWP = Y.Node.create(WorkplanNodeGeneratorHelper.ROW_WRAPPER);
+        	var rowWP = Y.Node.create(WorkplanNodeDomHelper.ROW_WRAPPER);
         	if(rowCount == null) {
         		rowCount = 0;
         	}
     		if(rowCount % 2 == 1) {
-    			rowWP = Y.Node.create(WorkplanNodeGeneratorHelper.ROW_WRAPPER_ODD);
+    			rowWP = Y.Node.create(WorkplanNodeDomHelper.ROW_WRAPPER_ODD);
         	} else {
-        		rowWP = Y.Node.create(WorkplanNodeGeneratorHelper.ROW_WRAPPER_EVEN);
+        		rowWP = Y.Node.create(WorkplanNodeDomHelper.ROW_WRAPPER_EVEN);
         	}
         	for(var colIndex = 0; colIndex < rowConfJson.length; colIndex++) {
         		var col = rowConfJson[colIndex];
@@ -58,10 +54,10 @@ YUI.add("nodeGenerator", function(Y) {
         			cellObject = Y.Node.create('<input name=\"' + col.field + '\" type=\"text\" />');
         		}
         		
-        		var cellLabelWP = Y.Node.create(WorkplanNodeGeneratorHelper.CELL_WRAPPER);
+        		var cellLabelWP = Y.Node.create(WorkplanNodeDomHelper.CELL_WRAPPER);
         		cellLabelWP.append(Y.Node.create('<label>' + col.name +'</label>'));
         		rowWP.appendChild(cellLabelWP);
-        		var cellWP = Y.Node.create(WorkplanNodeGeneratorHelper.CELL_WRAPPER);
+        		var cellWP = Y.Node.create(WorkplanNodeDomHelper.CELL_WRAPPER);
             	cellWP.appendChild(cellObject);
             	rowWP.appendChild(cellWP);
         	}
@@ -84,8 +80,8 @@ YUI.add("nodeGenerator", function(Y) {
     				for (var listI = 0; listI < list.size(); listI++) {
 						if(list.item(listI).get('selected')) {
 							if(list.item(listI).get('value') != '') {
-								cellValue = name + WorkplanNodeGeneratorHelper.CONNECTOR 
-								+ list.item(listI).get('value') + WorkplanNodeGeneratorHelper.CONNECTOR
+								cellValue = name + WorkplanNodeDomHelper.CONNECTOR 
+								+ list.item(listI).get('value') + WorkplanNodeDomHelper.CONNECTOR
 								+ "select";
 							} else {
 								cellValue = null
@@ -102,8 +98,8 @@ YUI.add("nodeGenerator", function(Y) {
         			var value = input.get('value');
         			if("" != value) {
         				cellValue = input.get('name') 
-        				+ WorkplanNodeGeneratorHelper.CONNECTOR 
-        				+ input.get('value') + WorkplanNodeGeneratorHelper.CONNECTOR
+        				+ WorkplanNodeDomHelper.CONNECTOR 
+        				+ input.get('value') + WorkplanNodeDomHelper.CONNECTOR
 						+ "double";
         			} else {
         				cellValue = null;
@@ -113,8 +109,8 @@ YUI.add("nodeGenerator", function(Y) {
         			var value = input.get('value');
         			if("" != value) {
         				cellValue = input.get('name') 
-        				+ WorkplanNodeGeneratorHelper.CONNECTOR 
-        				+ input.get('value') + WorkplanNodeGeneratorHelper.CONNECTOR
+        				+ WorkplanNodeDomHelper.CONNECTOR 
+        				+ input.get('value') + WorkplanNodeDomHelper.CONNECTOR
 						+ "text";
         			} else {
         				cellValue = null;
@@ -123,7 +119,36 @@ YUI.add("nodeGenerator", function(Y) {
     			rowValue.push(cellValue);
     		}
     		return rowValue;
-        }
+        },
+        
+        formatFileDesc : function(o) {
+	    	var values = o.data.typeDesc;
+	    	values = values.split(WorkplanNodeDomHelper.CONNECTOR);
+	    	var index = 1;
+	    	Y.each(values, function(value){
+	    		var wrapper = Y.Node.create(WorkplanNodeDomHelper.FILE_ITEM_WRAPPER);
+	    		wrapper.setHTML(index++ + "." + value);
+	    		o.cell.append(wrapper);
+	    	});
+	    	return false;
+	    },
+	    
+	    formatFileLink : function(o) {
+	    	var values = o.data.attachmentName;
+	    	values = values.split(WorkplanNodeDomHelper.CONNECTOR);
+	    	var urls = o.data.attachmentURL;
+	    	urls = urls.split(WorkplanNodeDomHelper.CONNECTOR);
+	    	
+	    	for(var index = 0; index < values.length; index++) {
+	    		var wrapper = Y.Node.create(WorkplanNodeDomHelper.FILE_ITEM_WRAPPER);
+	    		var link = Y.Node.create('<a>' + (index + 1) + '.' + values[index] + '</a>');
+	    		link.setAttribute('href', urls[index]);
+	    		wrapper.setHTML(link);
+	    		o.cell.append(wrapper);
+	    	}
+	    		
+	    	return false;
+	    }
 	});
 	
 }, '0.0.1', {requires:["base"]});

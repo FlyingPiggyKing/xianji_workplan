@@ -9,11 +9,13 @@ YUI.add("recordAdding", function(Y) {
 	RecordAdding.NAME = "recordAdding";
 	
 	RecordAdding.ATTRS = {
-		resourceURL: {value:""}
+		resourceURL: {value:""},
+		formRecords: {value:[]}
 	};
 	
 	RecordAdding.ROW_CONTAINER = '<div id=\'rowContainer\' class=\'yui3-g\'></div>';
-	RecordAdding.FORM_WRAPER = '<form enctype="multipart/form-data" method="POST"></form>';
+	RecordAdding.FORM_WRAPER = '<div class="yui3-g yui3-u-23-24"><form enctype="multipart/form-data" method="POST"></form>';
+	RecordAdding.FORM_INDEX = '<div class="yui3-u-1-24"></div>';
 	RecordAdding.ADDING_BUTTON = '<button id=\'addingButton\' class="btn btn-primary">添加记录</button>';
 	RecordAdding.SELECT_INPUT = '<input type="file" />';
 	RecordAdding.SUBMIT_BUTTON = '<button id=\'submitButton\' class="btn btn-primary">提交</button>';
@@ -25,7 +27,7 @@ YUI.add("recordAdding", function(Y) {
 	
 	Y.RecordAdding = Y.extend(RecordAdding, Y.Widget, {
 		initializer : function(cfg) {
-			this.generator = new Y.WorkplanNodeGeneratorHelper({'rowConfJson' : cfg.rowConfJson, 'hasDefault':true});
+			this.generator = new Y.WorkplanNodeDomHelper({'rowConfJson' : cfg.rowConfJson, 'hasDefault':true});
 			this.rowCount = 0;
 //			this.formNumber = 1;
 	    },
@@ -49,6 +51,9 @@ YUI.add("recordAdding", function(Y) {
         	submitButton.on('click', Y.bind(this._onSubmitClick, this));
         	
         	this.get("contentBox").delegate('click', Y.bind(this._onAddFileClick, this), '.addFile');
+        	
+        	//the content of submit dialog will be updated once the submit record changes
+        	this.after('formRecordsChange', this._afterformRecordsChange);
         },
         
         _onAddClick: function() {
@@ -60,16 +65,23 @@ YUI.add("recordAdding", function(Y) {
         	if(this.fileTypeSelector == null) {
         		this.fileTypeSelector = fileTypeSelector;
         	}
+        	//form record is used to indicate how many form is being submitted,
+        	//then user can see the progress when submit the records.
+        	var formRecords = this.get('formRecords');
+        	var recordIndex = formRecords.length + 1;
+        	var recordName = "记录" + recordIndex;
+        	formRecords.push(recordName + "提交中。。。");
+        	this.set('formRecords', formRecords);
+        	//record index
+        	var formIndex = Y.Node.create(RecordAdding.FORM_INDEX);
+        	formIndex.setHTML(recordName);
+        	rowCon.append(formIndex);
+        	//record from, following the index
         	var formCon = Y.Node.create(RecordAdding.FORM_WRAPER);
-        	formCon.append(rowWP);
+        	formCon.one('form').append(rowWP);
         	var addFileButton = Y.Node.create(RecordAdding.ADD_FILE_BUTTON);
-        	formCon.append(addFileButton);
-//        	formCon.setAttribute('id', this.formNumber);
-//        	this.formNumber += 1;
-        	
+        	formCon.one('form').append(addFileButton);	
         	rowCon.appendChild(formCon);
-        	
-//        	this.rowCount += 1;
         },
         
         _onSubmitClick: function() {
@@ -86,6 +98,20 @@ YUI.add("recordAdding", function(Y) {
         	this._submitValues(values);
 //        	rowCon.empty();
         	this.rowCount = 0;
+        },
+        
+        _afterformRecordsChange : function() {
+        	if(this.callbackPanel != null) {
+        		var formRecords = this.get('formRecords');
+        		var dialogContent = '';
+        		var contentDiv = this.callbackPanel.get('srcNode').one('.yui3-widget-bd');
+        		contentDiv.empty();
+        		Y.each(formRecords, function(record){
+        			var responseCon = Y.Node.create(RecordAdding.SUBMIT_RESPONSE_CONTAINER);
+        			responseCon.setHTML(record);
+        			contentDiv.append(responseCon);
+        		});
+        	}
         },
         
         _onAddFileClick : function(e) {
@@ -150,17 +176,26 @@ YUI.add("recordAdding", function(Y) {
 			        e.preventDefault();
 			        this.callbackPanel.hide();
 			        Y.fire(RecordAdding.EVENT_SUBMIT_COMPLETE, {'status' : 'success'});
-			        this.callbackPanel.get('srcNode').empty();
+			        this.set('formRecords', []);
 			    }, this);
 				this.callbackPanel.render();
 			}
-			var contentDiv = this.callbackPanel.get('srcNode');
-			var responseCon = Y.Node.create(RecordAdding.SUBMIT_RESPONSE_CONTAINER);
-			responseCon.setHTML(id + " submit successfully.");
-			contentDiv.one('.yui3-widget-bd').append(responseCon);
+//			var contentDiv = this.callbackPanel.get('srcNode');
+//			var responseCon = Y.Node.create(RecordAdding.SUBMIT_RESPONSE_CONTAINER);
+//			responseCon.setHTML(id + " submit successfully.");
+//			contentDiv.one('.yui3-widget-bd').append(responseCon);
+			var formRecords = this.get('formRecords');
+			for(var formIndex = 0; formIndex < formRecords.length; formIndex++) {
+				var curStr = formRecords[formIndex];
+				if(curStr.indexOf('提交成功') == -1) {
+					formRecords[formIndex] = curStr.substr(0, curStr.indexOf('提交中。。。')) + '提交成功';
+					break;
+				}
+			}
+			this.set('formRecords', formRecords);
 			this.callbackPanel.show();
 			
 		},
 	});
 	
-}, '0.0.1', {requires:["event", "nodeGenerator", "widget", "io", "aui-button", "json-parse"]});
+}, '0.0.1', {requires:["event", "domHelper", "widget", "io", "aui-button", "json-parse"]});
