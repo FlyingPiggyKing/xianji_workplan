@@ -237,7 +237,7 @@
 		</property>
 		<property name="researchProjectDao"  ref="ResearchProjectDao" />
 		<property name="workflowService"  ref="com.liming.workplan.service.WorkflowService" />
-		<property name="languageService"  ref="languageService" />
+		<property name="languageService"  ref="com.liming.workplan.service.LanguageService" />
 	</bean>
 	
 	<bean id="transactionAOP" class="com.liming.workplan.service.aop.TransactionAOP">

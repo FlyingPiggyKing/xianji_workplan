@@ -67,14 +67,6 @@ YUI.add("workplanTableWidget", function(Y) {
 	    },
 	    
 		setTableColumns : function(header) {
-//			for(var headerIndex = 0; headerIndex < header.length; headerIndex++) {
-//				if(header[headerIndex].key == "attachmentName") {
-//					header[headerIndex].allowHTML = true;
-//					header[headerIndex].nodeFormatter = this._nodeFormatter;
-//					break;
-//				}
-//				
-//			}
 			for(var headerIndex = 0; headerIndex < header.length; headerIndex++) {
 				//format url header.
 				//every url should be one line.

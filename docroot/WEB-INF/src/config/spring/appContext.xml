@@ -15,7 +15,7 @@
 	        </property>
 	        <property name="defaultEncoding" value="UTF-8"/>
     	</bean>
-    	<bean id="languageService" class="com.liming.workplan.service.impl.LanguageServiceImpl">
+    	<bean id="com.liming.workplan.service.LanguageService" class="com.liming.workplan.service.impl.LanguageServiceImpl">
     	</bean>
         <import resource="dataresource-hibernate.xml"/>
         <import resource="researchproject-service.xml"/>

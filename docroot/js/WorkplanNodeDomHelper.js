@@ -8,8 +8,8 @@ YUI.add("domHelper", function(Y) {
 	
 	WorkplanNodeDomHelper.NAME = "workplanNodeDomHelper";
 	WorkplanNodeDomHelper.CONNECTOR = "~-~";
-	WorkplanNodeDomHelper.ROW_WRAPPER_ODD = '<div class=\'rowWrapper yui3-g yui3-u\' style=\'background-color:#EDF5FF\'></div>';
-	WorkplanNodeDomHelper.ROW_WRAPPER_EVEN = '<div class=\'rowWrapper yui3-g yui3-u\'></div>';
+//	WorkplanNodeDomHelper.ROW_WRAPPER_ODD = '<div class=\'rowWrapper yui3-g yui3-u\' style=\'background-color:#EDF5FF\'></div>';
+	WorkplanNodeDomHelper.ROW_WRAPPER_EVEN = '<div class=\'rowWrapper yui3-g yui3-u-1\'></div>';
 	WorkplanNodeDomHelper.CELL_WRAPPER = '<div class=\'cellWrapper yui3-u-1-4\'></div>';
 	WorkplanNodeDomHelper.FILE_ITEM_WRAPPER = '<div class="fileLink" />';
 	
@@ -20,18 +20,12 @@ YUI.add("domHelper", function(Y) {
 			this.hasDefault = cfg.hasDefault;
 	    },
 	    
-        buildRow: function(rowCount) {
+        buildRow: function() {
         	var rowConfJson = Y.JSON.parse(this.rowConfJson).rowConfigJson;
 
         	var rowWP = Y.Node.create(WorkplanNodeDomHelper.ROW_WRAPPER);
-        	if(rowCount == null) {
-        		rowCount = 0;
-        	}
-    		if(rowCount % 2 == 1) {
-    			rowWP = Y.Node.create(WorkplanNodeDomHelper.ROW_WRAPPER_ODD);
-        	} else {
-        		rowWP = Y.Node.create(WorkplanNodeDomHelper.ROW_WRAPPER_EVEN);
-        	}
+
+    		rowWP = Y.Node.create(WorkplanNodeDomHelper.ROW_WRAPPER_EVEN);
         	for(var colIndex = 0; colIndex < rowConfJson.length; colIndex++) {
         		var col = rowConfJson[colIndex];
         		var cellObject = null;

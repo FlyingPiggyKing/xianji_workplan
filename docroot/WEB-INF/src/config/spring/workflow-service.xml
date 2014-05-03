@@ -17,6 +17,6 @@
 		<property name="workflowDao"  ref="WorkflowDao" />
 		<property name="researchProjectService"  ref="com.liming.workplan.service.ResearchProjectService" />
 		<property name="researchAchievementService"  ref="com.liming.workplan.service.ResearchAchievementService" />
-		<property name="languageService"  ref="languageService" />
+		<property name="languageService"  ref="com.liming.workplan.service.LanguageService" />
 	</bean>
 </beans>

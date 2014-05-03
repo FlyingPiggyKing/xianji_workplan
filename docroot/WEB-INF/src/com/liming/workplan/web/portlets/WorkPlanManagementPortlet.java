@@ -27,6 +27,7 @@ import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
+import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
@@ -51,9 +52,18 @@ public class WorkPlanManagementPortlet extends WorlplanBasePortlet {
 
 		if(Constants.WorlplanBasePortlet_RESOURCE_CMD_ADD.equals(cmd)) {
 			UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(resourceRequest);
-			List<Map<String, Object>> fileParams = uploadFileToUserFolder(
-					resourceRequest, uploadRequest);
-			addNodes(uploadRequest, fileParams);
+			List<Map<String, Object>> fileParams = null;
+			try {
+				fileParams = uploadFileToUserFolder(resourceRequest, uploadRequest);
+			} catch (DuplicateFileException e) {
+				JSONObject result = JsonTool.convertStringToJson(SUBMIT_RESULT, BeanLocator.getLanguageService().getMessage(SUBMIT_FAILURE));
+				resourceResponse.getWriter().write(result.toString());
+			}
+			if(fileParams != null) {
+				addNodes(uploadRequest, fileParams);
+				JSONObject result = JsonTool.convertStringToJson(SUBMIT_RESULT, BeanLocator.getLanguageService().getMessage(SUBMIT_SUCCESS));
+				resourceResponse.getWriter().write(result.toString());
+			}
 		} else if(Constants.WorlplanBasePortlet_RESOURCE_CMD_LOAD_PUBLISHED_NODES.equals(cmd)) {
 			getPublishedNodes(resourceRequest, resourceResponse);
 		} else if(Constants.WorlplanBasePortlet_RESOURCE_CMD_LOAD_UNPUBLISHED_NODES.equals(cmd)) {

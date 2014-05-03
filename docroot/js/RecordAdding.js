@@ -24,6 +24,8 @@ YUI.add("recordAdding", function(Y) {
 	RecordAdding.DIALOG_CONTAINER = '<div class="dialogContainer" />';
 	RecordAdding.SUBMIT_RESPONSE_CONTAINER = '<div class="responseContainer" />';
 	RecordAdding.EVENT_SUBMIT_COMPLETE = RecordAdding.NAME + ":submitComplete";
+	RecordAdding.RECORD_ODD = '<div class=\'yui3-g yui3-u-1\' style=\'background-color:#EDF5FF\'></div>';
+	RecordAdding.RECORD_EVEN = '<div class=\'yui3-g yui3-u-1\'></div>';
 	
 	Y.RecordAdding = Y.extend(RecordAdding, Y.Widget, {
 		initializer : function(cfg) {
@@ -59,7 +61,9 @@ YUI.add("recordAdding", function(Y) {
         _onAddClick: function() {
         	var contentBox = this.get('contentBox');
         	var rowCon = contentBox.one('#rowContainer');
-        	var rowWP = this.generator.buildRow(this.rowCount);
+        	//remove the file upload input from normal configuration,
+        	//"add attachment" button will be responsible for generating the file upload widget 
+        	var rowWP = this.generator.buildRow();
         	var fileTypeSelector = rowWP.one('select[name="typeDesc"]').ancestor('div');
         	rowWP.removeChild(fileTypeSelector);
         	if(this.fileTypeSelector == null) {
@@ -72,16 +76,27 @@ YUI.add("recordAdding", function(Y) {
         	var recordName = "记录" + recordIndex;
         	formRecords.push(recordName + "提交中。。。");
         	this.set('formRecords', formRecords);
-        	//record index
+        	//begin to add record to the page
+        	//append a record wrapper first, the color should be depend on the row number
+        	var recordWrapper = null;
+    		if(++this.rowCount % 2 == 1) {
+    			recordWrapper = Y.Node.create(RecordAdding.RECORD_EVEN);
+	    	} else {
+	    		recordWrapper = Y.Node.create(RecordAdding.RECORD_ODD);
+	    	}
+        	
+        	//record name should like '记录1'
         	var formIndex = Y.Node.create(RecordAdding.FORM_INDEX);
         	formIndex.setHTML(recordName);
-        	rowCon.append(formIndex);
+        	recordWrapper.append(formIndex);
         	//record from, following the index
         	var formCon = Y.Node.create(RecordAdding.FORM_WRAPER);
         	formCon.one('form').append(rowWP);
         	var addFileButton = Y.Node.create(RecordAdding.ADD_FILE_BUTTON);
         	formCon.one('form').append(addFileButton);	
-        	rowCon.appendChild(formCon);
+        	recordWrapper.appendChild(formCon);
+        	//add record to the page
+        	rowCon.append(recordWrapper);
         },
         
         _onSubmitClick: function() {
@@ -96,7 +111,7 @@ YUI.add("recordAdding", function(Y) {
         		values.push(row);
         	}
         	this._submitValues(values);
-//        	rowCon.empty();
+        	rowCon.empty();
         	this.rowCount = 0;
         },
         
@@ -140,7 +155,7 @@ YUI.add("recordAdding", function(Y) {
     			            upload: true
     			        },
     					on: {
-    						complete: Y.bind(this._onSubmitSuccessed, this)
+    						complete: Y.bind(this._onSubmitComplete, this)
     					}
     			};
 //            	rowWP.appendChild('<input type="hidden" name="resource_cmd" value="add" />');
@@ -150,52 +165,78 @@ YUI.add("recordAdding", function(Y) {
         	Y.io.queue.start();
         },
         
-        _onSubmitSuccessed : function(id, res) {
-			if(this.callbackPanel == null) {
-				this.callbackPanel = new Y.Panel({
-					srcNode : this.get('contentBox').one('.dialogContainer'),
-					bodyContent: '操作成功',
-					visible  : false,
-			        width   : 400,
-			        centered: true,
-
-			        // Make changes to the buttons through the `buttons` attribute,
-			        // which takes an Array of Objects.
-			        buttons  : {
-			            footer: [
-			                {
-			                    name     : 'proceed',
-			                    label    : '确认',
-			                    action   : 'onOK'
-			                }
-			            ]
-			        }
-			    });
-				
-				this.callbackPanel.onOK = Y.bind(function (e) {
-			        e.preventDefault();
-			        this.callbackPanel.hide();
-			        Y.fire(RecordAdding.EVENT_SUBMIT_COMPLETE, {'status' : 'success'});
-			        this.set('formRecords', []);
-			    }, this);
-				this.callbackPanel.render();
+        _onSubmitComplete : function(id, res) {
+        	if(this.callbackPanel == null) {
+				this._initDialog();
 			}
-//			var contentDiv = this.callbackPanel.get('srcNode');
-//			var responseCon = Y.Node.create(RecordAdding.SUBMIT_RESPONSE_CONTAINER);
-//			responseCon.setHTML(id + " submit successfully.");
-//			contentDiv.one('.yui3-widget-bd').append(responseCon);
-			var formRecords = this.get('formRecords');
+        	var json = Y.JSON.parse(res.responseText);
+        	var result = json.result;
+//        	if(error != null) {
+//        		this._onSubmitFailure(error);
+//        	} else {
+//        		this._onSubmitSuccessed();
+//        	}
+        	var formRecords = this.get('formRecords');
 			for(var formIndex = 0; formIndex < formRecords.length; formIndex++) {
 				var curStr = formRecords[formIndex];
-				if(curStr.indexOf('提交成功') == -1) {
-					formRecords[formIndex] = curStr.substr(0, curStr.indexOf('提交中。。。')) + '提交成功';
+				var submitIndex = curStr.indexOf('提交中。。。');
+				if(submitIndex != -1) {
+					formRecords[formIndex] = curStr.substr(0, submitIndex) + result;
 					break;
 				}
 			}
 			this.set('formRecords', formRecords);
 			this.callbackPanel.show();
+        },
+        
+//        _onSubmitSuccessed : function(result) {
+//			var formRecords = this.get('formRecords');
+//			for(var formIndex = 0; formIndex < formRecords.length; formIndex++) {
+//				var curStr = formRecords[formIndex];
+//				var submitIndex = curStr.indexOf('提交中。。。');
+//				if(submitIndex != -1) {
+//					formRecords[formIndex] = curStr.substr(0, submitIndex) + '提交成功';
+//					break;
+//				}
+//			}
+//			this.set('formRecords', formRecords);
+//			this.callbackPanel.show();
+//		},
+//		
+//		_onSubmitFailure : function(error) {
+//			this.set('formRecords', [error]);
+//			this.callbackPanel.show();
+//		},
+		
+		_initDialog : function() {
+			this.callbackPanel = new Y.Panel({
+				srcNode : this.get('contentBox').one('.dialogContainer'),
+				bodyContent: '操作成功',
+				visible  : false,
+		        width   : 400,
+		        centered: true,
+
+		        // Make changes to the buttons through the `buttons` attribute,
+		        // which takes an Array of Objects.
+		        buttons  : {
+		            footer: [
+		                {
+		                    name     : 'proceed',
+		                    label    : '确认',
+		                    action   : 'onOK'
+		                }
+		            ]
+		        }
+		    });
 			
-		},
+			this.callbackPanel.onOK = Y.bind(function (e) {
+		        e.preventDefault();
+		        this.callbackPanel.hide();
+		        Y.fire(RecordAdding.EVENT_SUBMIT_COMPLETE, {'status' : 'success'});
+		        this.set('formRecords', []);
+		    }, this);
+			this.callbackPanel.render();
+		}
 	});
 	
 }, '0.0.1', {requires:["event", "domHelper", "widget", "io", "aui-button", "json-parse"]});

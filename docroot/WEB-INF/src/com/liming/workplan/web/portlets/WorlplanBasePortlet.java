@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.portlet.PortletException;
 import javax.portlet.ResourceRequest;
 import javax.portlet.ResourceResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -26,16 +27,22 @@ import com.liferay.portal.service.ServiceContextFactory;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
+import com.liferay.portlet.documentlibrary.DuplicateFileException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.util.bridges.mvc.MVCPortlet;
 import com.liming.workplan.utils.Constants;
+import com.liming.workplan.utils.JsonTool;
 import com.liming.workplan.utils.UserThreadLocal;
 
 public abstract class WorlplanBasePortlet extends MVCPortlet  {
 	public static final String UPLOAD_FILE_PARAM = "attachmentFile";
 	public static final String UPLOAD_DESC_PARAM = "attachment";
+	
+	public static final String SUBMIT_SUCCESS = "submit-success";
+	public static final String SUBMIT_FAILURE = "submit-failure";
+	public static final String SUBMIT_RESULT = "result";
 	
 	@Override
 	public void serveResource(
@@ -49,8 +56,18 @@ public abstract class WorlplanBasePortlet extends MVCPortlet  {
 
 		if(Constants.WorlplanBasePortlet_RESOURCE_CMD_ADD.equals(cmd)) {
 			UploadPortletRequest uploadRequest = PortalUtil.getUploadPortletRequest(resourceRequest);
-			List<Map<String, Object>> fileParams = uploadFileToUserFolder(resourceRequest, uploadRequest);
-			addNodes(uploadRequest, fileParams);
+			List<Map<String, Object>> fileParams = null;
+			try {
+				fileParams = uploadFileToUserFolder(resourceRequest, uploadRequest);
+			} catch (DuplicateFileException e) {
+				HttpServletResponse response = PortalUtil.getHttpServletResponse(resourceResponse);
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				resourceResponse.getWriter().write(JsonTool.convertStringToJson("error", "Duplicated File.").toString());
+			}
+			if(fileParams != null) {
+				addNodes(uploadRequest, fileParams);
+			}
+			
 		} else if(Constants.WorlplanBasePortlet_RESOURCE_CMD_LOAD_PUBLISHED_NODES.equals(cmd)) {
 			getPublishedNodes(resourceRequest, resourceResponse);
 		} else if(Constants.WorlplanBasePortlet_RESOURCE_CMD_LOAD_UNPUBLISHED_NODES.equals(cmd)) {
@@ -77,7 +94,7 @@ public abstract class WorlplanBasePortlet extends MVCPortlet  {
 	
 	protected List<Map<String, Object>> uploadFileToUserFolder(
 			ResourceRequest resourceRequest, UploadPortletRequest uploadRequest)
-			throws IOException {
+			throws IOException, DuplicateFileException {
 		long parentFolderId = 14058;//need to be changed
 		ServiceContext serviceContext = null;
 		FileEntry fileEntry = null;
@@ -183,6 +200,8 @@ public abstract class WorlplanBasePortlet extends MVCPortlet  {
 //			}
 
 //				DLAppServiceUtil.addFileEntry(repositoryId, folderId, sourceFileName, mimeType, title, description, changeLog, is, size, serviceContext)
+		} catch (DuplicateFileException e) {
+			throw e;
 		} catch (PortalException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

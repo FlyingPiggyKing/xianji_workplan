@@ -72,6 +72,12 @@ public class JsonTool {
 		return count;
 	}
 	
+	public static JSONObject convertStringToJson(String name, String value) {
+		JSONObject count = JSONFactoryUtil.createJSONObject();
+		count.put(name, value);
+		return count;
+	}
+	
 	public static JSONObject convertStatMapToJson(Map<String, String> map) {
 		JSONObject objJson = JSONFactoryUtil.createJSONObject();
 		Set<String> keys = map.keySet();

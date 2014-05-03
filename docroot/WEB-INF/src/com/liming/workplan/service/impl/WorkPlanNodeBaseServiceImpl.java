@@ -58,16 +58,21 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 	private static final String SEPATOR = "~-~";
 	
 	private enum TableColumn {
-		ATTACHMENT_NAME(Constants.Attachment_NAME), 
-		ATTACHMENT_URL(Constants.Attachment_URL),
-		TYPE_DESE(Constants.Attachment_DESC);
+		ATTACHMENT_NAME(Constants.Attachment_NAME, false), 
+		ATTACHMENT_URL(Constants.Attachment_URL, false),
+		TYPE_DESE(Constants.Attachment_DESC, false);
 		
 		private final String value;
-        private TableColumn(String value) {
+		private final boolean isSortable;
+        private TableColumn(String value, boolean isSortable) {
             this.value = value;
+            this.isSortable = isSortable;
         }
         public String value() {
         	return value;
+        }
+        public boolean isSortable() {
+        	return this.isSortable;
         }
 	}
 	

@@ -21,4 +21,8 @@ public class BeanLocator {
 	public static WorkflowService getWorkflowService() {
 		return (WorkflowService)ctx.getBean(WorkflowService.class.getName());
 	}
+	
+	public static LanguageService getLanguageService() {
+		return (LanguageService)ctx.getBean(LanguageService.class.getName());
+	}
 }
