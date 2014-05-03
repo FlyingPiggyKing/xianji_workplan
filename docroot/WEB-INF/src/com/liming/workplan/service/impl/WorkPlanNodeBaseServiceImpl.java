@@ -71,17 +71,16 @@ public abstract class WorkPlanNodeBaseServiceImpl {
         public String value() {
         	return value;
         }
-        public boolean isSortable() {
-        	return this.isSortable;
-        }
 	}
 	
 	protected enum UnPublishColumn {
-		STATUS("status");
+		STATUS("status", true);
 		
 		private final String value;
-        private UnPublishColumn(String value) {
+		private final boolean isSortable;
+        private UnPublishColumn(String value, boolean isSortable) {
             this.value = value;
+            this.isSortable = isSortable;
         }
         public String value() {
         	return value;
@@ -142,51 +141,80 @@ public abstract class WorkPlanNodeBaseServiceImpl {
 		row.put(TableColumn.TYPE_DESE.value(), desc.toString());
 	}
 	
-	public List<String[]> getPublishedTableHeader() {
-		LanguageService service = getLanguageService();
+	public List<Map<String, Object>> getPublishedTableHeader() {
+		List<String> tableHeaderString = getTableHeaderString();
+		tableHeaderString.addAll(getBaseTableHeaderString());
+		List<String> localTableHeaderString = languageService.getLocalTableHeader(tableHeaderString);
 		
-		List<String> tableHeader = getTableHeader();
-		List<String> baseTableHeader = getBaseTableHeader();
+		List<Boolean> tableHeaderSort = getTableHeaderSorting();
+		tableHeaderSort.addAll(getBaseTableHeaderSorting());
 		
-		List<String[]> columnValues = new ArrayList<String[]>(tableHeader.size() + baseTableHeader.size());
+//		List<String[]> columnValues = new ArrayList<String[]>(tableHeader.size() + baseTableHeader.size());
 		
-		columnValues.addAll(service.getLocalTableHeader(tableHeader));
-		columnValues.addAll(service.getLocalTableHeader(baseTableHeader));
+//		columnValues.addAll(service.getLocalTableHeader(tableHeader));
+//		columnValues.addAll(service.getLocalTableHeader(baseTableHeader));
+		List<Map<String, Object>> tableHeader = generateTableHeader(
+				tableHeaderString, localTableHeaderString, tableHeaderSort);
 
-		return columnValues;
+		return tableHeader;
+	}
+
+	private List<Map<String, Object>> generateTableHeader(
+			List<String> tableHeaderString,
+			List<String> localTableHeaderString, List<Boolean> tableHeaderSort) {
+		List<Map<String, Object>> tableHeader = new ArrayList<Map<String, Object>>();
+		for(int mapIndex = 0; mapIndex < tableHeaderString.size(); mapIndex++) {
+			Map<String, Object> mapItem = new HashMap<String, Object>();
+			mapItem.put("key", tableHeaderString.get(mapIndex));
+			mapItem.put("label", localTableHeaderString.get(mapIndex));
+			mapItem.put("remoteSortable", tableHeaderSort.get(mapIndex));
+			tableHeader.add(mapItem);
+		}
+		return tableHeader;
 	}
 	
-	public List<String[]> getUnPublishedTableHeader() {
-		LanguageService service = getLanguageService();
-	
-		List<String> tableHeader = getTableHeader();
-		List<String> baseTableHeader = getBaseTableHeader();
+	public List<Map<String, Object>> getUnPublishedTableHeader() {
+		List<String> tableHeaderString = new ArrayList<String>();
+		tableHeaderString.add(UnPublishColumn.STATUS.value());
+		tableHeaderString.addAll(getTableHeaderString());
+		tableHeaderString.addAll(getBaseTableHeaderString());
+		List<String> localTableHeaderString = languageService.getLocalTableHeader(tableHeaderString);
 		
-		List<String[]> columnValues = new ArrayList<String[]>(tableHeader.size() + baseTableHeader.size() + 1);
+		List<Boolean> tableHeaderSort = new ArrayList<Boolean>();
+		tableHeaderSort.add(UnPublishColumn.STATUS.isSortable);	
+		tableHeaderSort.addAll(getTableHeaderSorting());
+		tableHeaderSort.addAll(getBaseTableHeaderSorting());
 		
-		columnValues.add(new String[]{UnPublishColumn.STATUS.value(), service.getMessage(UnPublishColumn.STATUS.value())});	
-		columnValues.addAll(service.getLocalTableHeader(tableHeader));
-		columnValues.addAll(service.getLocalTableHeader(baseTableHeader));
-		
-		return columnValues;
+		List<Map<String, Object>> tableHeader = generateTableHeader(
+				tableHeaderString, localTableHeaderString, tableHeaderSort);
+
+		return tableHeader;
 	}
 	
 	public List<String> getExportTableHeader() {
-		List<String> columnValues = new ArrayList<String>();
-		
-		columnValues.addAll(getTableHeader());
-		columnValues.addAll(getBaseTableHeader());
-		return columnValues;
+		List<String> tableHeaderString = getTableHeaderString();
+		tableHeaderString.addAll(getBaseTableHeaderString());
+		List<String> localTableHeaderString = languageService.getLocalTableHeader(tableHeaderString);
+		return localTableHeaderString;
 	}
 	
-	protected abstract List<String> getTableHeader();
+	protected abstract List<String> getTableHeaderString();
+	protected abstract List<Boolean> getTableHeaderSorting();
 	
-	protected List<String> getBaseTableHeader() {
+	protected List<String> getBaseTableHeaderString() {
 		List<String> columnValues = new ArrayList<String>();
 		
 		columnValues.add(TableColumn.TYPE_DESE.value());
 		columnValues.add(TableColumn.ATTACHMENT_NAME.value());
 		return columnValues;
+	}
+	
+	protected List<Boolean> getBaseTableHeaderSorting() {
+		List<Boolean> sortables = new ArrayList<Boolean>();
+		
+		sortables.add(TableColumn.TYPE_DESE.isSortable);
+		sortables.add(TableColumn.ATTACHMENT_NAME.isSortable);
+		return sortables;
 	}
 	
 	

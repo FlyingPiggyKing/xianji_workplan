@@ -75,6 +75,7 @@ YUI.add("workplanTableWidget", function(Y) {
 						key: 'typeDesc',
 						allowHTML: true,
 						label:header[headerIndex].label,
+						remoteSortable:header[headerIndex].remoteSortable,
 						nodeFormatter: this.domHelper.formatFileDesc	
 					}
 					
@@ -83,6 +84,7 @@ YUI.add("workplanTableWidget", function(Y) {
 						key: 'attachmentName',
 						allowHTML: true,
 						label:header[headerIndex].label,
+						remoteSortable:header[headerIndex].remoteSortable,
 						nodeFormatter: this.domHelper.formatFileLink	
 					}
 				}

@@ -199,7 +199,7 @@ YUI.add("baseTableWidget", function(Y) {
 	    		if(header.constructor == String) {
 	    			header = {key:header};
 	    		}
-	    		if(header.key != "checkbox") {
+	    		if(header.key != "checkbox" && header.remoteSortable == true) {
 	    			header.headerTemplate = '<th id="{id}" class="{className}"><div id=\'{key}\' class=\'datatable-sort-cell-container\'>{label}<span class=\'sortArrow\'></span></div></th>';
 	    		} 
 	    		

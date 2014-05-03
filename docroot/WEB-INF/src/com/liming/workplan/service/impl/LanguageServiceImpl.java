@@ -53,13 +53,13 @@ public class LanguageServiceImpl implements LanguageService, ApplicationContextA
 		return messageRows;
 	}
 	
-	public List<String[]> getLocalTableHeader(List<String> header) {
+	public List<String> getLocalTableHeader(List<String> header) {
 		User currentUser = UserThreadLocal.getCurrentUser();
 		Locale userLocale = currentUser.getLocale();
-		List<String[]> localHeader = new ArrayList<String[]>(header.size());
+		List<String> localHeader = new ArrayList<String>(header.size());
 		for(String column : header) {
-			String[] columnValue = new String[]{column, getMessage(column, userLocale)};
-			localHeader.add(columnValue);
+			String localValue = getMessage(column, userLocale);
+			localHeader.add(localValue);
 		}
 		return localHeader;
 	}

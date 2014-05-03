@@ -118,12 +118,12 @@ public class WorkPlanManagementPortlet extends WorlplanBasePortlet {
 		ResearchProjectService researchProjectService = BeanLocator.getResearchProjectService();
 		List<Map<String, String>> result = null;
 		result = researchProjectService.loadPublishedResearchProject(searchParams, Integer.parseInt(pageNumber), Integer.parseInt(pageSize), sortColumn, sortOrder);
-		JSONObject resultJson = JsonTool.convertResultListToJson(result);
+		JSONObject resultJson = JsonTool.convertMapStringToJson(result);
 		
 		String needGneedGetHeaderetHeader = resourceRequest.getParameter("header");
 		if(needGneedGetHeaderetHeader != null) {
-			List<String[]> header = researchProjectService.getPublishedTableHeader();
-			JSONArray headerJson = JsonTool.convertTableHederToJson(header);
+			List<Map<String, Object>> header = researchProjectService.getPublishedTableHeader();
+			JSONArray headerJson = JsonTool.convertMapObjectToJson(header);
 			resultJson.put("header", headerJson);
 		}
 		
@@ -142,12 +142,12 @@ public class WorkPlanManagementPortlet extends WorlplanBasePortlet {
 		List<Map<String, String>> result = null;
 		result = researchProjectService.loadUnPublishedResearchProject(Integer.parseInt(pageNumber), Integer.parseInt(pageSize), sortColumn, sortOrder);
 		
-		JSONObject resultJson = JsonTool.convertResultListToJson(result);
+		JSONObject resultJson = JsonTool.convertMapStringToJson(result);
 		
 		String needGneedGetHeaderetHeader = resourceRequest.getParameter("header");
 		if(needGneedGetHeaderetHeader != null) {
-			List<String[]> header = researchProjectService.getUnPublishedTableHeader();
-			JSONArray headerJson = JsonTool.convertTableHederToJson(header);
+			List<Map<String, Object>> header = researchProjectService.getUnPublishedTableHeader();
+			JSONArray headerJson = JsonTool.convertMapObjectToJson(header);
 			resultJson.put("header", headerJson);
 		}
 		
@@ -182,8 +182,8 @@ public class WorkPlanManagementPortlet extends WorlplanBasePortlet {
 		ResearchProjectService researchProjectService = BeanLocator.getResearchProjectService();
 		Map<String, String> statistics = researchProjectService.getStatistics(searchParams);
 		JSONObject statisticJson = JsonTool.convertStatMapToJson(statistics);
-		List<String[]> statHeader = researchProjectService.getStatisticsHeader();
-		JSONArray headerJson = JsonTool.convertTableHederToJson(statHeader);
+		List<Map<String, Object>> statHeader = researchProjectService.getStatisticsHeader();
+		JSONArray headerJson = JsonTool.convertMapObjectToJson(statHeader);
 		statisticJson.put("header", headerJson);
 		resourceResponse.getWriter().write(statisticJson.toString());
 	}

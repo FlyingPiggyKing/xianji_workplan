@@ -80,12 +80,12 @@ public class WorkflowManagementPortlet extends MVCPortlet {
 			resourceRequest.getPortletSession().setAttribute(WORKFLOW_ENTITY, resultEnitity);
 			
 			List<Map<String, String>> resultData = WorkplanDataThreadLocal.getDisplayData(nodeType);
-			JSONObject resultJson = JsonTool.convertResultListToJson(resultData);
+			JSONObject resultJson = JsonTool.convertMapStringToJson(resultData);
 			
 			String needGneedGetHeaderetHeader = resourceRequest.getParameter("header");
 			if(needGneedGetHeaderetHeader != null) {
-				List<String[]> header = workflowService.getWorkflowHeader(nodeType);
-				JSONArray headerJson = JsonTool.convertTableHederToJson(header);
+				List<Map<String, Object>> header = workflowService.getWorkflowHeader(nodeType);
+				JSONArray headerJson = JsonTool.convertMapObjectToJson(header);
 				resultJson.put("header", headerJson);
 			}
 			resourceResponse.getWriter().write(resultJson.toString());

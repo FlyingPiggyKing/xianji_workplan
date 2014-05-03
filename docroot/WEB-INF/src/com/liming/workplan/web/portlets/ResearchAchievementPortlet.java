@@ -41,12 +41,12 @@ public class ResearchAchievementPortlet extends WorlplanBasePortlet {
 		ResearchAchievementService researchAchievementService = BeanLocator.getResearchAchievementService();
 		List<Map<String, String>> result = null;
 		result = researchAchievementService.loadPublishedResearchAchievement(searchParams, Integer.parseInt(pageNumber), Integer.parseInt(pageSize), sortColumn, sortOrder);
-		JSONObject resultJson = JsonTool.convertResultListToJson(result);
+		JSONObject resultJson = JsonTool.convertMapStringToJson(result);
 		
 		String needGneedGetHeaderetHeader = resourceRequest.getParameter("header");
 		if(needGneedGetHeaderetHeader != null) {
-			List<String[]> header = researchAchievementService.getPublishedTableHeader();
-			JSONArray headerJson = JsonTool.convertTableHederToJson(header);
+			List<Map<String, Object>> header = researchAchievementService.getPublishedTableHeader();
+			JSONArray headerJson = JsonTool.convertMapObjectToJson(header);
 			resultJson.put("header", headerJson);
 		}
 		
@@ -65,12 +65,12 @@ public class ResearchAchievementPortlet extends WorlplanBasePortlet {
 		List<Map<String, String>> result = null;
 		result = researchAchievementService.loadUnPublishedResearchAchievement(Integer.parseInt(pageNumber), Integer.parseInt(pageSize), sortColumn, sortOrder);
 		
-		JSONObject resultJson = JsonTool.convertResultListToJson(result);
+		JSONObject resultJson = JsonTool.convertMapStringToJson(result);
 		
 		String needGneedGetHeaderetHeader = resourceRequest.getParameter("header");
 		if(needGneedGetHeaderetHeader != null) {
-			List<String[]> header = researchAchievementService.getUnPublishedTableHeader();
-			JSONArray headerJson = JsonTool.convertTableHederToJson(header);
+			List<Map<String, Object>> header = researchAchievementService.getUnPublishedTableHeader();
+			JSONArray headerJson = JsonTool.convertMapObjectToJson(header);
 			resultJson.put("header", headerJson);
 		}
 		

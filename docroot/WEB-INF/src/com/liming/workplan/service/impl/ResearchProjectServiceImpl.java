@@ -20,20 +20,22 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 	private final String TARGET_TYPE = "ResearchProject";
 	private final String FORMAT_DOUBLE = "#.00000";
 	private enum TableColumn {
-		NODEID("nodeId"),
-		TYPE("type"),
-		PROJECT_TYPE("projectType"),
-		PROJECT_NAME("projectName"),
-		SUPPORT_UNIT("supportUnit"),
-		PROJECT_LEVEL("projectLevel"),
-		CHARGER("charger"),
-		ASSISTANT("assistant"),
-		PROJECT_FUNDING("projectFunding"),
-		DELEGATED_DEPARTMENT("delegatedDepartment");
+		NODEID("nodeId", true),
+		TYPE("type", true),
+		PROJECT_TYPE("projectType", true),
+		PROJECT_NAME("projectName", true),
+		SUPPORT_UNIT("supportUnit", true),
+		PROJECT_LEVEL("projectLevel", true),
+		CHARGER("charger", true),
+		ASSISTANT("assistant", true),
+		PROJECT_FUNDING("projectFunding", true),
+		DELEGATED_DEPARTMENT("delegatedDepartment", true);
 		
 		private final String value;
-        private TableColumn(String value) {
+		private final boolean isSortable;
+        private TableColumn(String value, boolean isSortable) {
             this.value = value;
+            this.isSortable = isSortable;
         }
         public String value() {
         	return value;
@@ -111,7 +113,7 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 		return result;
 	}
 	
-	protected List<String> getTableHeader() {
+	protected List<String> getTableHeaderString() {
 		List<String> columnValues = new ArrayList<String>();
 		
 		for(TableColumn column : TableColumn.values()) {
@@ -120,7 +122,14 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 		return columnValues;
 	}
 	
-
+	protected List<Boolean> getTableHeaderSorting() {
+		List<Boolean> columnValues = new ArrayList<Boolean>();
+		
+		for(TableColumn column : TableColumn.values()) {
+			columnValues.add(column.isSortable);
+		}
+		return columnValues;
+	}
 
 	@Override
 	public void updateNodes(List<ResearchProject> nodes) {
@@ -158,9 +167,13 @@ public class ResearchProjectServiceImpl extends WorkPlanNodeBaseServiceImpl impl
 	}
 
 	@Override
-	public List<String[]> getStatisticsHeader() {
-		List<String[]> columnValues = new ArrayList<String[]>(1);
-		columnValues.add(new String[]{StatisticsColumn.PROJECT_FOUNDING.value(), getLanguageService().getMessage(StatisticsColumn.PROJECT_FOUNDING.value())});
+	public List<Map<String, Object>> getStatisticsHeader() {
+		List<Map<String, Object>> columnValues = new ArrayList<Map<String, Object>>(1);
+//		columnValues.add(new String[]{StatisticsColumn.PROJECT_FOUNDING.value(), getLanguageService().getMessage(StatisticsColumn.PROJECT_FOUNDING.value())});
+		Map<String, Object> header = new HashMap<String, Object>(2);
+		header.put("key", StatisticsColumn.PROJECT_FOUNDING.value());
+		header.put("label", getLanguageService().getMessage(StatisticsColumn.PROJECT_FOUNDING.value()));
+		columnValues.add(header);
 		return columnValues;
 	}
 	

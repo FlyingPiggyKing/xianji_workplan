@@ -36,12 +36,14 @@ public class WorkflowServiceImpl implements WorkflowService {
 	private final String NODE_TYPE_RESEARCH_ACHIEVEMENT = "ResearchAchievement";
 	private LanguageService languageService;
 	private enum WorkflowColumn {
-		APPROVER("approver"),
-		APPROVEDDATE("approvedDate");
+		APPROVER("approver", true),
+		APPROVEDDATE("approvedDate", true);
 		
 		private final String value;
-        private WorkflowColumn(String value) {
+		private final boolean isSortable;
+        private WorkflowColumn(String value, boolean isSortable) {
             this.value = value;
+            this.isSortable = isSortable;
         }
         public String value() {
         	return value;
@@ -229,17 +231,58 @@ public class WorkflowServiceImpl implements WorkflowService {
 	}
 
 	@Override
-	public List<String[]> getWorkflowHeader(String nodeType) {
-		List<String[]> workplanHeader = null;
+	public List<Map<String, Object>> getWorkflowHeader(String nodeType) {
+		List<Map<String, Object>> workplanHeader = null;
 		workplanHeader = getWorkplanHeaderByType(nodeType, workplanHeader);
-		List<String[]> workflowHeader = new ArrayList<String[]>(workplanHeader.size() + WorkflowColumn.values().length);
+		List<Map<String, Object>> workflowHeader = new ArrayList<Map<String, Object>>(workplanHeader.size() + WorkflowColumn.values().length);
 		workflowHeader.addAll(workplanHeader);
-		User currentUser = UserThreadLocal.getCurrentUser();
-		Locale userLocale = currentUser.getLocale();
-		for(WorkflowColumn workflowNodeCell : WorkflowColumn.values()) {
-			workflowHeader.add(new String[]{workflowNodeCell.value(), languageService.getMessage(workflowNodeCell.value(), userLocale)});
-		}
+//		User currentUser = UserThreadLocal.getCurrentUser();
+//		Locale userLocale = currentUser.getLocale();
+		
+//		for(WorkflowColumn workflowNodeCell : WorkflowColumn.values()) {
+//			workflowHeader.add(new String[]{workflowNodeCell.value(), languageService.getMessage(workflowNodeCell.value(), userLocale)});
+//		}
+		
+		List<String> tableHeaderString = getTableHeaderString();
+		List<String> localTableHeaderString = languageService.getLocalTableHeader(tableHeaderString);
+		List<Boolean> tableHeaderSort = getTableHeaderSorting();
+		List<Map<String, Object>> tableHeader = generateTableHeader(
+				tableHeaderString, localTableHeaderString, tableHeaderSort);
+		
+		workflowHeader.addAll(tableHeader);
 		return workflowHeader;
+	}
+	
+	private List<Map<String, Object>> generateTableHeader(
+			List<String> tableHeaderString,
+			List<String> localTableHeaderString, List<Boolean> tableHeaderSort) {
+		List<Map<String, Object>> tableHeader = new ArrayList<Map<String, Object>>();
+		for(int mapIndex = 0; mapIndex < tableHeaderString.size(); mapIndex++) {
+			Map<String, Object> mapItem = new HashMap<String, Object>();
+			mapItem.put("key", tableHeaderString.get(mapIndex));
+			mapItem.put("label", localTableHeaderString.get(mapIndex));
+			mapItem.put("remoteSortable", tableHeaderSort.get(mapIndex));
+			tableHeader.add(mapItem);
+		}
+		return tableHeader;
+	}
+	
+	protected List<String> getTableHeaderString() {
+		List<String> columnValues = new ArrayList<String>();
+		
+		for(WorkflowColumn column : WorkflowColumn.values()) {
+			columnValues.add(column.value());
+		}
+		return columnValues;
+	}
+	
+	protected List<Boolean> getTableHeaderSorting() {
+		List<Boolean> columnValues = new ArrayList<Boolean>();
+		
+		for(WorkflowColumn column : WorkflowColumn.values()) {
+			columnValues.add(column.isSortable);
+		}
+		return columnValues;
 	}
 	
 	private void fillWorkplanByType(String nodeType, Object[] entites,
@@ -251,8 +294,8 @@ public class WorkflowServiceImpl implements WorkflowService {
 		}
 	}
 	
-	private List<String[]> getWorkplanHeaderByType(String nodeType,
-			List<String[]> workplanHeader) {
+	private List<Map<String, Object>> getWorkplanHeaderByType(String nodeType,
+			List<Map<String, Object>> workplanHeader) {
 		if(NODE_TYPE_RESEARCH_PROJECT.equals(nodeType)) {
 			workplanHeader = researchProjectService.getPublishedTableHeader();
 		} else if(NODE_TYPE_RESEARCH_ACHIEVEMENT.equals(nodeType)) {

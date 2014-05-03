@@ -39,7 +39,7 @@ public class JsonTool {
 		return containerJson;
 	}
 	
-	public static JSONObject convertResultListToJson(List<Map<String, String>> result) {
+	public static JSONObject convertMapStringToJson(List<Map<String, String>> result) {
 		JSONArray rowsJson = JSONFactoryUtil.createJSONArray();
 		for(Map<String, String> row : result) {
 			JSONObject rowJson = JSONFactoryUtil.createJSONObject();
@@ -55,16 +55,37 @@ public class JsonTool {
 		return containerJson;
 	}
 	
-	public static JSONArray convertTableHederToJson(List<String[]> columns) {
-		JSONArray columnsJson = JSONFactoryUtil.createJSONArray();
-		for(String[] column : columns) {
+	public static JSONArray convertMapObjectToJson(List<Map<String, Object>> result) {
+		JSONArray rowsJson = JSONFactoryUtil.createJSONArray();
+		for(Map<String, Object> row : result) {
 			JSONObject rowJson = JSONFactoryUtil.createJSONObject();
-			rowJson.put("key", column[0]);
-			rowJson.put("label", column[1]);
-			columnsJson.put(rowJson);
+			Set<String> keys = row.keySet();		
+			for(String key : keys) {
+				Object value = row.get(key);
+				if(value instanceof Boolean) {
+					rowJson.put(key, (Boolean)value);
+				} else {
+					rowJson.put(key, (String)value);
+				}
+				
+			}
+			rowsJson.put(rowJson);
 		}
-		return columnsJson;
+//		JSONObject containerJson = JSONFactoryUtil.createJSONObject();
+//		containerJson.put("data", rowsJson);
+		return rowsJson;
 	}
+	
+//	public static JSONArray convertTableHederToJson(List<String[]> columns) {
+//		JSONArray columnsJson = JSONFactoryUtil.createJSONArray();
+//		for(String[] column : columns) {
+//			JSONObject rowJson = JSONFactoryUtil.createJSONObject();
+//			rowJson.put("key", column[0]);
+//			rowJson.put("label", column[1]);
+//			columnsJson.put(rowJson);
+//		}
+//		return columnsJson;
+//	}
 	
 	public static JSONObject convertNumberToJson(String name, Long number) {
 		JSONObject count = JSONFactoryUtil.createJSONObject();

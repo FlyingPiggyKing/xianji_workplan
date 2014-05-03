@@ -12,8 +12,8 @@ public interface ResearchAchievementService {
 	public List<Map<String, Object>> getSearchConfiguration();
 	public List<Map<String, String>> loadPublishedResearchAchievement(String[] searchParams, int pageNumber, int pageSize, String sortColumn, String order);
 	public List<Map<String, String>> loadUnPublishedResearchAchievement(int pageNumber, int pageSize, String sortColumn, String order);
-	public List<String[]> getPublishedTableHeader();
-	public List<String[]> getUnPublishedTableHeader();
+	public List<Map<String, Object>> getPublishedTableHeader();
+	public List<Map<String, Object>> getUnPublishedTableHeader();
 	public void fillDisplayTable(ResearchAchievement node, Map<String, String> row);
 	public void updateNodes(List<ResearchAchievement> nodes);
 	public void deleteResearchAchievements(String[] ids);

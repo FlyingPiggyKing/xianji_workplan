@@ -13,14 +13,14 @@ public interface ResearchProjectService {
 	public List<Map<String, Object>> getSearchConfiguration();
 	public List<Map<String, String>> loadPublishedResearchProject(String[] searchParams, int pageNumber, int pageSize, String sortColumn, String order);
 	public List<Map<String, String>> loadUnPublishedResearchProject(int pageNumber, int pageSize, String sortColumn, String order);
-	public List<String[]> getPublishedTableHeader();
-	public List<String[]> getUnPublishedTableHeader();
+	public List<Map<String, Object>> getPublishedTableHeader();
+	public List<Map<String, Object>> getUnPublishedTableHeader();
 	public void fillDisplayTable(ResearchProject node, Map<String, String> row);
 	public void updateNodes(List<ResearchProject> nodes);
 	public void deleteResearchProjects(String[] ids);
 	public Long getPublishedCount(String[] searchParams);
 	public Long getUnPublishedCount();
 	public Map<String, String> getStatistics(String[] searchParams);
-	public List<String[]> getStatisticsHeader();
+	public List<Map<String, Object>> getStatisticsHeader();
 	public void exportResult(String[] searchParams, OutputStream os);
 }

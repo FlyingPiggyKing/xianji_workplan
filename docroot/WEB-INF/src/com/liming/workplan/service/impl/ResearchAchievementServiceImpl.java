@@ -21,19 +21,21 @@ public class ResearchAchievementServiceImpl extends WorkPlanNodeBaseServiceImpl
 	private final String TARGET_TYPE = "ResearchAchievement";
 	private final String FORMAT_DOUBLE = "#.00000";
 	private enum TableColumn {
-		NODEID("nodeId"),
-		TYPE("type"),
-		SUB_TYPE("subType"),
-		ACHIEVEMENT_NAME("achievementName"),
-		ACHIEVEMENT_AUTHOR("achievementAuthor"),
-		PUBLISH_CHANNEL("publishChannel"),
-		PUBLISH_DETAIL("publishDetail"),
-		LANGUAGE("language"),
-		REMARK("remark");
+		NODEID("nodeId", true),
+		TYPE("type", true),
+		SUB_TYPE("subType", true),
+		ACHIEVEMENT_NAME("achievementName", true),
+		ACHIEVEMENT_AUTHOR("achievementAuthor", true),
+		PUBLISH_CHANNEL("publishChannel", true),
+		PUBLISH_DETAIL("publishDetail", true),
+		LANGUAGE("language", true),
+		REMARK("remark", true);
 		
 		private final String value;
-        private TableColumn(String value) {
+		private final boolean isSortable;
+        private TableColumn(String value, boolean isSortable) {
             this.value = value;
+            this.isSortable = isSortable;
         }
         public String value() {
         	return value;
@@ -99,11 +101,20 @@ public class ResearchAchievementServiceImpl extends WorkPlanNodeBaseServiceImpl
 		return result;
 	}
 	
-	protected List<String> getTableHeader() {
+	protected List<String> getTableHeaderString() {
 		List<String> columnValues = new ArrayList<String>();
 		
 		for(TableColumn column : TableColumn.values()) {
 			columnValues.add(column.value());
+		}
+		return columnValues;
+	}
+	
+	protected List<Boolean> getTableHeaderSorting() {
+		List<Boolean> columnValues = new ArrayList<Boolean>();
+		
+		for(TableColumn column : TableColumn.values()) {
+			columnValues.add(column.isSortable);
 		}
 		return columnValues;
 	}
